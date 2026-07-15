@@ -54,3 +54,20 @@ filet de sécurité, et c'est aussi le format le plus pratique à consulter sur 
 Remplace `index.html` dans le dépôt. Le service worker sert le réseau en premier, donc
 la nouvelle version arrive à la prochaine ouverture avec du réseau. Si ça coince, incrémente
 `nyc-shell-v1` en `nyc-shell-v2` dans `sw.js`.
+
+---
+
+## Mise à jour de juillet (v2)
+
+Pour mettre à jour l'app déjà en ligne : dans ton dépôt GitHub, **Add file → Upload files**,
+glisse les nouveaux `index.html` et `sw.js` (ils remplacent les anciens) → *Commit changes*.
+À la prochaine ouverture de l'app avec du réseau, la nouvelle version se charge.
+
+Nouveautés :
+- Ton itinéraire du brief est pré-rempli (jours 1, 2, 3, 5 confirmés ; Greenwich/Queens/Harlem posés sur les jours restants, à déplacer).
+- Menus repensés pour le téléphone : ils s'ouvrent maintenant depuis le bas, bouton Fermer à portée de pouce.
+- Photos automatiques des lieux (chargées depuis Wikipédia quand tu as du réseau, puis gardées hors ligne).
+- Deux thèmes : Nuit (métro) et Papier (affiche de service) — bouton en haut.
+
+⚠️ La v2 repart sur l'itinéraire pré-rempli : si tu avais déjà saisi des choses dans la v1
+sur ton téléphone, elles ne sont pas reprises (exporte-les avant de mettre à jour si besoin).

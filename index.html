@@ -16,22 +16,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
 <style>
-  :root{
-    --ink:#0B0B0C;
-    --panel:#141416;
-    --panel-2:#1C1C1F;
-    --line:#2B2B30;
-    --paper:#F2F2F0;
-    --steel:#8E8E94;
-    --steel-dim:#5A5A60;
-    --r:2px;
-    --font: "Helvetica Neue", Helvetica, Inter, Arial, sans-serif;
-    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  }
   *{box-sizing:border-box; margin:0; padding:0}
-  html,body{background:var(--ink); margin:0; height:100%; overscroll-behavior:none}
+  html,body{height:100%; overscroll-behavior:none; background:#000}
   body{-webkit-tap-highlight-color:transparent}
+
   #app{
+    /* ── thème Nuit (métro) ── */
+    --ink:#0B0B0C; --panel:#141416; --panel-2:#1C1C1F; --line:#2B2B30;
+    --paper:#F2F2F0; --steel:#8E8E94; --steel-dim:#5A5A60;
+    --sign:#000; --hot:#FCCC0A; --glass:rgba(11,11,12,.86);
+    --r:2px;
+    --font:"Helvetica Neue", Helvetica, Inter, Arial, sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+
     background:var(--ink); color:var(--paper);
     font-family:var(--font); font-size:14px; line-height:1.45;
     -webkit-font-smoothing:antialiased;
@@ -40,267 +37,202 @@
     padding-top:env(safe-area-inset-top);
     padding-bottom:env(safe-area-inset-bottom);
   }
+  /* ── thème Papier (affiche de service) ── */
+  #app[data-theme="light"]{
+    --ink:#F1F0EB; --panel:#FAF9F5; --panel-2:#E7E5DD; --line:#D3D0C5;
+    --paper:#151515; --steel:#6E6C64; --steel-dim:#A6A399;
+    --sign:#FAF9F5; --hot:#EE352E; --glass:rgba(250,249,245,.88);
+  }
   button{font-family:inherit; font-size:inherit; color:inherit; background:none; border:none; cursor:pointer}
   input,textarea{font-family:inherit; font-size:inherit; color:inherit; background:none; border:none; outline:none; width:100%}
   input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--paper); outline-offset:1px}
   ::placeholder{color:var(--steel-dim)}
 
-  /* ---------- signage bar ---------- */
   .sign{
-    display:flex; align-items:center; gap:14px;
+    display:flex; align-items:center; gap:12px;
     padding:11px 14px; border-bottom:1px solid var(--line);
-    background:#000; flex:none;
+    background:var(--sign); flex:none;
   }
-  .sign h1{
-    font-size:17px; font-weight:700; letter-spacing:-.02em; text-transform:uppercase;
-    white-space:nowrap;
-  }
-  .sign .dates{
-    font:500 11px/1 var(--mono); color:var(--steel); letter-spacing:.06em;
-    padding-left:14px; border-left:1px solid var(--line); white-space:nowrap;
-  }
+  .sign h1{font-size:17px; font-weight:700; letter-spacing:-.02em; text-transform:uppercase; white-space:nowrap}
+  .sign .dates{font:500 11px/1 var(--mono); color:var(--steel); letter-spacing:.06em; padding-left:12px; border-left:1px solid var(--line); white-space:nowrap}
   .sign .spacer{flex:1}
-  .countdown{font:700 11px/1 var(--mono); letter-spacing:.08em; color:#FCCC0A; white-space:nowrap}
+  .countdown{font:700 11px/1 var(--mono); letter-spacing:.08em; color:var(--hot); white-space:nowrap}
   .tool{
-    font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--steel);
-    padding:6px 9px; border:1px solid var(--line); border-radius:var(--r); white-space:nowrap;
+    font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--steel);
+    padding:7px 9px; border:1px solid var(--line); border-radius:var(--r); white-space:nowrap;
   }
   .tool:hover{color:var(--paper); border-color:var(--steel)}
 
-  /* ---------- main ---------- */
   .main{display:flex; flex:1; min-height:0}
 
-  /* ---------- day rail ---------- */
-  .rail{
-    flex:none; width:104px; border-right:1px solid var(--line);
-    padding:16px 0; overflow-y:auto; position:relative; background:var(--panel);
-  }
-  .rail::before{
-    content:""; position:absolute; left:31px; top:34px; bottom:34px; width:2px;
-    background:var(--line);
-  }
-  .day-btn{
-    display:flex; align-items:center; gap:9px; width:100%;
-    padding:5px 8px; position:relative; z-index:1; text-align:left;
-  }
+  /* ── rail des jours ── */
+  .rail{flex:none; width:104px; border-right:1px solid var(--line); padding:16px 0; overflow-y:auto; position:relative; background:var(--panel)}
+  .rail::before{content:""; position:absolute; left:31px; top:34px; bottom:34px; width:2px; background:var(--line)}
+  .day-btn{display:flex; align-items:center; gap:9px; width:100%; padding:5px 8px; position:relative; z-index:1; text-align:left}
   .bullet{
-    flex:none; width:30px; height:30px; border-radius:50%;
-    display:grid; place-items:center;
-    font:700 14px/1 var(--font); color:#000;
-    border:2px solid var(--panel);
+    flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+    font:700 14px/1 var(--font); border:2px solid var(--panel);
     opacity:.34; transition:opacity .15s, transform .15s;
   }
   .day-btn.on .bullet{opacity:1; transform:scale(1.1)}
   .day-btn:hover .bullet{opacity:.75}
   .day-btn.on:hover .bullet{opacity:1}
   .day-meta{min-width:0}
-  .day-meta b{
-    display:block; font:700 10px/1.3 var(--mono); letter-spacing:.06em;
-    text-transform:uppercase; color:var(--steel);
-  }
+  .day-meta b{display:block; font:700 10px/1.3 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--steel)}
   .day-btn.on .day-meta b{color:var(--paper)}
   .day-meta span{display:block; font:400 9px/1.3 var(--mono); color:var(--steel-dim)}
 
-  /* ---------- day panel ---------- */
-  .day{
-    flex:none; width:400px; border-right:1px solid var(--line);
-    display:flex; flex-direction:column; min-height:0;
-  }
-  .day-head{padding:18px 18px 14px; border-bottom:1px solid var(--line); flex:none}
-  .eyebrow{
-    display:flex; align-items:center; gap:8px;
-    font:700 10px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase;
-    color:var(--steel); margin-bottom:9px;
-  }
+  /* ── panneau du jour ── */
+  .day{flex:none; width:400px; border-right:1px solid var(--line); display:flex; flex-direction:column; min-height:0; position:relative; background:var(--ink)}
+  .day-head{padding:16px 18px 13px; border-bottom:1px solid var(--line); flex:none}
+  .eyebrow{display:flex; align-items:center; gap:8px; font:700 10px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:8px}
   .eyebrow .chip{width:8px; height:8px; border-radius:50%}
   .title-in{font-size:22px; font-weight:700; letter-spacing:-.025em; padding:1px 0}
-  .note-in{
-    font-size:12.5px; color:var(--steel); resize:none; margin-top:5px;
-    line-height:1.5; overflow:hidden;
-  }
-  .sun{
-    display:flex; gap:16px; margin-top:12px;
-    font:400 10px/1 var(--mono); letter-spacing:.04em; color:var(--steel-dim);
-  }
+  .note-in{font-size:12.5px; color:var(--steel); resize:none; margin-top:5px; line-height:1.5; overflow:hidden}
+  .sun{display:flex; gap:14px; margin-top:11px; font:400 10px/1 var(--mono); letter-spacing:.04em; color:var(--steel-dim); flex-wrap:wrap}
   .sun b{color:var(--steel); font-weight:400}
 
-  /* ---------- stops ---------- */
-  .stops{flex:1; overflow-y:auto; padding:6px 18px 90px}
-  .stop{display:flex; gap:11px; position:relative}
+  .stops{flex:1; overflow-y:auto; padding:6px 18px 96px; -webkit-overflow-scrolling:touch}
+  .stop{display:flex; gap:10px; position:relative}
   .track{flex:none; width:14px; display:flex; flex-direction:column; align-items:center; padding-top:14px}
-  .track i{
-    width:11px; height:11px; border-radius:50%; background:var(--ink);
-    border:3px solid currentColor; flex:none; z-index:1;
-  }
+  .track i{width:11px; height:11px; border-radius:50%; background:var(--ink); border:3px solid currentColor; flex:none; z-index:1}
   .track u{flex:1; width:2px; background:currentColor; opacity:.35; margin:2px 0 -2px}
   .stop:last-child .track u{display:none}
   .stop.done .track i{background:currentColor}
   .body{flex:1; padding:10px 0 12px; min-width:0}
-  .row1{display:flex; align-items:baseline; gap:9px}
-  .time-in{
-    width:44px; flex:none; font:500 11px/1 var(--mono); color:var(--steel);
-    letter-spacing:.02em;
-  }
+  .row1{display:flex; align-items:baseline; gap:8px}
+  .time-in{width:42px; flex:none; font:500 11px/1 var(--mono); color:var(--steel); letter-spacing:.02em}
   .name{font-size:14.5px; font-weight:700; letter-spacing:-.01em; flex:1; min-width:0}
-  .stop.done .name, .stop.done .time-in{text-decoration:line-through; color:var(--steel-dim)}
-  .acts{display:flex; gap:1px; opacity:0; transition:opacity .12s; flex:none}
-  .stop:hover .acts, .stop:focus-within .acts{opacity:1}
-  .acts button{
-    width:20px; height:20px; display:grid; place-items:center;
-    color:var(--steel-dim); font:400 12px/1 var(--mono); border-radius:var(--r);
-  }
-  .acts button:hover{color:var(--paper); background:var(--panel-2)}
-  .tags{display:flex; gap:7px; margin:3px 0 0 53px; font:400 10px/1 var(--mono); color:var(--steel-dim); letter-spacing:.04em}
+  .stop.done .name,.stop.done .time-in{text-decoration:line-through; color:var(--steel-dim)}
+  .acts{display:flex; gap:0; flex:none}
+  .acts button{width:24px; height:24px; display:grid; place-items:center; color:var(--steel-dim); font:400 13px/1 var(--mono); border-radius:var(--r)}
+  .acts button:active,.acts button:hover{color:var(--paper); background:var(--panel-2)}
+  .tags{display:flex; gap:7px; margin:3px 0 0 50px; font:400 10px/1 var(--mono); color:var(--steel-dim); letter-spacing:.04em; flex-wrap:wrap}
   .tags .cat{color:var(--steel)}
-  .snote{
-    margin:6px 0 0 53px; font-size:12px; color:var(--steel); line-height:1.5;
-    resize:none; overflow:hidden;
+  .snote{margin:6px 0 0 50px; font-size:12px; color:var(--steel); line-height:1.5; resize:none; overflow:hidden}
+  .thumb{
+    flex:none; width:56px; height:56px; margin-top:13px; border-radius:4px;
+    background:var(--panel-2) center/cover no-repeat; display:grid; place-items:center;
+    font-size:18px; overflow:hidden; border:1px solid var(--line);
   }
-  .empty{
-    margin:26px 0; padding:20px; border:1px dashed var(--line); border-radius:var(--r);
-    text-align:center; color:var(--steel-dim); font-size:12.5px; line-height:1.6;
-  }
-  .addbar{
-    position:absolute; left:18px; right:18px; bottom:14px;
-    display:flex; gap:6px;
-  }
-  .day{position:relative}
-  .addbar button{
-    flex:1; padding:10px; background:var(--panel-2); border:1px solid var(--line);
-    border-radius:var(--r); font:700 10px/1 var(--mono); letter-spacing:.09em;
-    text-transform:uppercase; color:var(--paper);
-  }
+  .thumb.has{font-size:0; border-color:transparent}
+  .empty{margin:26px 0; padding:20px; border:1px dashed var(--line); border-radius:var(--r); text-align:center; color:var(--steel-dim); font-size:12.5px; line-height:1.6}
+  .addbar{position:absolute; left:18px; right:18px; bottom:calc(12px + env(safe-area-inset-bottom)); display:flex; gap:6px}
+  .addbar button{flex:1; padding:12px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--r); font:700 10px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--paper)}
   .addbar button:hover{background:var(--line)}
-  .addbar button.ghost{color:var(--steel); background:transparent; flex:none; padding:10px 12px}
+  .addbar button.ghost{color:var(--steel); background:var(--ink); flex:none; padding:12px}
   .addbar button.ghost:hover{color:var(--paper)}
 
-  /* ---------- map ---------- */
+  /* ── carte ── */
   .mapwrap{flex:1; position:relative; min-width:0; background:var(--panel)}
   #map{position:absolute; inset:0; background:var(--panel)}
   .leaflet-container{background:var(--panel)}
-  .mapbar{
-    position:absolute; z-index:500; top:12px; left:12px; right:12px;
-    display:flex; gap:6px; pointer-events:none;
-  }
+  .mapbar{position:absolute; z-index:500; top:10px; left:10px; right:10px; display:flex; gap:6px; pointer-events:none}
   .mapbar > *{pointer-events:auto}
-  .mtool{
-    padding:6px 10px; background:rgba(11,11,12,.86); border:1px solid var(--line);
-    border-radius:var(--r); font:700 9.5px/1 var(--mono); letter-spacing:.09em;
-    text-transform:uppercase; color:var(--steel); backdrop-filter:blur(6px);
-  }
+  .mtool{padding:7px 10px; background:var(--glass); border:1px solid var(--line); border-radius:var(--r); font:700 9.5px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--steel); backdrop-filter:blur(6px)}
   .mtool:hover{color:var(--paper)}
-  .mtool.on{color:#000; background:var(--paper); border-color:var(--paper)}
-  .mk{display:grid; place-items:center; border-radius:50%; font:700 12px/1 var(--font); color:#000; border:2px solid rgba(0,0,0,.5); box-shadow:0 1px 5px rgba(0,0,0,.6)}
-  .mk.faded{opacity:.28}
-  .mk.mini{font-size:0; border-width:2px}
-  .leaflet-popup-content-wrapper{background:var(--ink); color:var(--paper); border-radius:var(--r); border:1px solid var(--line)}
-  .leaflet-popup-content{margin:9px 12px; font-family:var(--font); font-size:12.5px; line-height:1.5}
-  .leaflet-popup-content b{display:block; font-size:13.5px; margin-bottom:2px}
-  .leaflet-popup-content em{font:400 10px/1 var(--mono); color:var(--steel); font-style:normal; letter-spacing:.05em}
+  .mtool.on{color:var(--ink); background:var(--paper); border-color:var(--paper)}
+  .mk{display:grid; place-items:center; border-radius:50%; font:700 12px/1 var(--font); border:2px solid rgba(0,0,0,.45); box-shadow:0 1px 5px rgba(0,0,0,.45)}
+  .mk.faded{opacity:.3}
+  .mk.mini{font-size:0}
+  .leaflet-popup-content-wrapper{background:var(--ink); color:var(--paper); border-radius:4px; border:1px solid var(--line); box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .leaflet-popup-content{margin:0; width:230px !important; font-family:var(--font); font-size:12.5px; line-height:1.5}
+  .pop-img{width:100%; height:120px; background:var(--panel-2) center/cover no-repeat; border-radius:3px 3px 0 0}
+  .pop-tx{padding:9px 12px 11px}
+  .pop-tx b{display:block; font-size:13.5px; margin-bottom:2px}
+  .pop-tx em{font:400 10px/1 var(--mono); color:var(--steel); font-style:normal; letter-spacing:.05em}
+  .pop-tx p{margin-top:6px}
   .leaflet-popup-tip{background:var(--ink)}
-  .leaflet-popup-close-button{color:var(--steel) !important}
+  .leaflet-popup-close-button{color:var(--steel) !important; z-index:2}
   .leaflet-bar a{background:var(--panel-2); color:var(--paper); border-color:var(--line)}
   .leaflet-bar a:hover{background:var(--line); color:var(--paper)}
-  .leaflet-control-attribution{background:rgba(11,11,12,.7) !important; color:var(--steel-dim) !important; font-size:9px !important}
+  .leaflet-control-attribution{background:var(--glass) !important; color:var(--steel-dim) !important; font-size:9px !important}
   .leaflet-control-attribution a{color:var(--steel) !important}
-  .offline{
-    position:absolute; inset:0; display:none; place-items:center; z-index:400;
-    color:var(--steel-dim); font:400 12px/1.6 var(--mono); text-align:center; padding:24px;
-  }
+  .offline{position:absolute; inset:0; display:none; place-items:center; z-index:400; color:var(--steel-dim); font:400 12px/1.6 var(--mono); text-align:center; padding:24px}
   .mapwrap.off .offline{display:grid}
 
-  /* ---------- library drawer ---------- */
-  .scrim{
-    position:absolute; inset:0; z-index:900; background:rgba(0,0,0,.6);
-    display:none; backdrop-filter:blur(2px);
-  }
+  /* ── tiroir ── */
+  .scrim{position:fixed; inset:0; z-index:900; background:rgba(0,0,0,.55); display:none; backdrop-filter:blur(2px)}
   .scrim.on{display:block}
   .drawer{
     position:absolute; top:0; right:0; bottom:0; width:min(460px,100%);
     background:var(--panel); border-left:1px solid var(--line);
     display:flex; flex-direction:column;
+    padding-top:env(safe-area-inset-top);
   }
-  .dhead{padding:14px 16px; border-bottom:1px solid var(--line); flex:none}
-  .dhead .r{display:flex; align-items:center; gap:10px; margin-bottom:11px}
+  .grab{display:none}
+  .dhead{padding:12px 16px; border-bottom:1px solid var(--line); flex:none}
+  .dhead .r{display:flex; align-items:center; gap:10px; margin-bottom:10px}
   .dhead h2{font:700 12px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; flex:1}
-  .search{
-    padding:9px 11px; background:var(--panel-2); border:1px solid var(--line);
-    border-radius:var(--r); font-size:13px;
+  .close{
+    flex:none; padding:9px 14px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:var(--r); font:700 10px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase;
   }
+  .close:active,.close:hover{background:var(--line)}
+  .search{padding:10px 11px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--r); font-size:16px}
   .filters{display:flex; flex-wrap:wrap; gap:5px; margin-top:9px}
-  .f{
-    padding:5px 9px; border:1px solid var(--line); border-radius:99px;
-    font:400 10px/1 var(--mono); letter-spacing:.05em; color:var(--steel);
-  }
+  .f{padding:6px 9px; border:1px solid var(--line); border-radius:99px; font:400 10px/1 var(--mono); letter-spacing:.05em; color:var(--steel)}
   .f:hover{color:var(--paper)}
-  .f.on{background:var(--paper); color:#000; border-color:var(--paper)}
-  .list{flex:1; overflow-y:auto; padding:6px 0}
-  .item{
-    display:flex; gap:11px; width:100%; text-align:left; padding:10px 16px;
-    border-bottom:1px solid rgba(43,43,48,.5);
-  }
-  .item:hover{background:var(--panel-2)}
-  .item .ic{flex:none; width:22px; font-size:14px; line-height:1.4; text-align:center; filter:grayscale(1) brightness(1.6)}
-  .item:hover .ic{filter:none}
+  .f.on{background:var(--paper); color:var(--ink); border-color:var(--paper)}
+  .list{flex:1; overflow-y:auto; padding:6px 0 calc(10px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch}
+  .item{display:flex; gap:11px; width:100%; text-align:left; padding:10px 16px; border-bottom:1px solid var(--line); align-items:flex-start}
+  .item:active,.item:hover{background:var(--panel-2)}
+  .item .thumb{width:52px; height:52px; margin-top:2px; font-size:16px}
   .item .t{flex:1; min-width:0}
   .item .t b{display:block; font-size:13.5px; font-weight:700; letter-spacing:-.01em}
-  .item .t i{
-    display:block; font:400 9.5px/1.4 var(--mono); color:var(--steel-dim);
-    font-style:normal; letter-spacing:.05em; text-transform:uppercase; margin-top:1px;
-  }
+  .item .t i{display:block; font:400 9.5px/1.4 var(--mono); color:var(--steel-dim); font-style:normal; letter-spacing:.05em; text-transform:uppercase; margin-top:1px}
   .item .t p{font-size:11.5px; color:var(--steel); line-height:1.45; margin-top:4px}
-  .item .add{flex:none; color:var(--steel-dim); font:400 16px/1 var(--mono); align-self:center}
+  .item .add{flex:none; color:var(--steel-dim); font:400 18px/1 var(--mono); align-self:center; padding:6px}
   .item:hover .add{color:var(--paper)}
   .item.used{opacity:.4}
 
-  .form{padding:16px; display:flex; flex-direction:column; gap:11px}
+  .form{padding:16px; display:flex; flex-direction:column; gap:11px; overflow-y:auto; padding-bottom:calc(20px + env(safe-area-inset-bottom))}
   .field label{display:block; font:700 9.5px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--steel-dim); margin-bottom:5px}
-  .field input,.field textarea{
-    padding:9px 11px; background:var(--panel-2); border:1px solid var(--line);
-    border-radius:var(--r); font-size:13px;
-  }
+  .field input,.field textarea{padding:10px 11px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--r); font-size:16px}
   .field textarea{resize:vertical; min-height:64px; line-height:1.5}
   .hint{font-size:11px; color:var(--steel-dim); line-height:1.5}
-  .submit{
-    padding:11px; background:var(--paper); color:#000; border-radius:var(--r);
-    font:700 10px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase;
-  }
+  .submit{padding:13px; background:var(--paper); color:var(--ink); border-radius:var(--r); font:700 10px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase}
   .submit:hover{opacity:.85}
 
   .toast{
-    position:absolute; bottom:16px; left:50%; transform:translateX(-50%) translateY(20px);
-    z-index:1000; background:var(--paper); color:#000; padding:9px 16px;
-    border-radius:var(--r); font:700 10px/1 var(--mono); letter-spacing:.07em;
-    text-transform:uppercase; opacity:0; transition:all .2s; pointer-events:none;
+    position:fixed; bottom:calc(18px + env(safe-area-inset-bottom)); left:50%;
+    transform:translateX(-50%) translateY(20px); z-index:1000;
+    background:var(--paper); color:var(--ink); padding:10px 16px; border-radius:var(--r);
+    font:700 10px/1 var(--mono); letter-spacing:.07em; text-transform:uppercase;
+    opacity:0; transition:all .2s; pointer-events:none; max-width:88vw; text-align:center;
   }
   .toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
 
   .tabs{display:none}
-  @media (max-width:980px){
-    .day{width:340px}
-  }
+
+  @media (max-width:980px){ .day{width:340px} }
+
   @media (max-width:760px){
+    .sign{gap:8px; padding:10px 12px}
     .sign .dates{display:none}
     .main{flex-direction:column}
-    .rail{
-      width:100%; height:auto; flex:none; display:flex; gap:2px;
-      overflow-x:auto; padding:10px 12px; border-right:none; border-bottom:1px solid var(--line);
-    }
+    .rail{width:100%; height:auto; flex:none; display:flex; gap:2px; overflow-x:auto; padding:10px 12px 8px; border-right:none; border-bottom:1px solid var(--line)}
     .rail::before{left:12px; right:12px; top:24px; bottom:auto; width:auto; height:2px}
     .day-btn{width:auto; flex-direction:column; gap:4px; padding:0 5px; flex:none}
     .day-meta{text-align:center}
-    .tabs{
-      display:flex; flex:none; border-bottom:1px solid var(--line); background:var(--panel);
-    }
-    .tabs button{
-      flex:1; padding:11px; font:700 10px/1 var(--mono); letter-spacing:.09em;
-      text-transform:uppercase; color:var(--steel-dim); border-bottom:2px solid transparent;
-    }
+    .tabs{display:flex; flex:none; border-bottom:1px solid var(--line); background:var(--panel)}
+    .tabs button{flex:1; padding:12px; font:700 10px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--steel-dim); border-bottom:2px solid transparent}
     .tabs button.on{color:var(--paper); border-bottom-color:var(--paper)}
     .day{width:100%; border-right:none; flex:1}
-    .mapwrap{flex:1}
     .pane{display:none}
     .pane.on{display:flex}
+    .mapwrap.pane.on{display:block}
+
+    /* tiroir → panneau du bas, tout est à portée de pouce */
+    .drawer{
+      top:auto; left:0; right:0; bottom:0; width:100%;
+      height:min(620px, 86dvh);
+      border-left:none; border-top:1px solid var(--line);
+      border-radius:14px 14px 0 0;
+      padding-top:0; padding-bottom:0;
+    }
+    .grab{display:block; width:42px; height:5px; border-radius:3px; background:var(--line); margin:8px auto 3px; flex:none}
+    .thumb{width:52px; height:52px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
@@ -313,6 +245,7 @@
     <div class="dates">04 → 11 AOÛT 2026</div>
     <div class="spacer"></div>
     <div class="countdown" id="cd"></div>
+    <button class="tool" id="btnTheme">Papier</button>
     <button class="tool" id="btnExport">Exporter</button>
   </div>
 
@@ -348,30 +281,26 @@
     </section>
   </div>
 
-  <div class="scrim" id="scrim">
-    <div class="drawer" id="drawer"></div>
-  </div>
+  <div class="scrim" id="scrim"><div class="drawer" id="drawer"></div></div>
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
-/* ═══════════ 1. Bibliothèque de spots (nom, cat, lat, lng, zone, note) ═══════════ */
+/* ═══════════ 1. Bibliothèque de spots ═══════════ */
 const CATS = {
-  photo:  {label:'Spot photo',  icon:'📷'},
-  shop:   {label:'Streetwear / friperie', icon:'👕'},
-  culture:{label:'Musée / culture', icon:'🏛'},
-  icon:   {label:'Incontournable', icon:'🗽'},
-  food:   {label:'Food', icon:'🍽'},
-  park:   {label:'Parc', icon:'🌳'},
-  custom: {label:'Perso', icon:'📍'}
+  photo:{label:'Spot photo',icon:'📷'}, shop:{label:'Streetwear / friperie',icon:'👕'},
+  culture:{label:'Musée / culture',icon:'🏛'}, icon:{label:'Incontournable',icon:'🗽'},
+  food:{label:'Food',icon:'🍽'}, park:{label:'Parc',icon:'🌳'}, custom:{label:'Perso',icon:'📍'}
 };
 const LIB = [
-// ── Photo / skyline
-['Dumbo — Washington St','photo',40.7033,-73.9894,'Brooklyn',"Le plan du Manhattan Bridge encadré par les briques. Avant 8h, sinon foule et soleil de face."],
+// Photo / skyline
+['Dumbo — Washington St','photo',40.7033,-73.9894,'Brooklyn',"Le plan du Manhattan Bridge encadré par les briques. Avant 8h, sinon foule et soleil de face. Clocktower Building et Eagle Warehouse autour."],
 ['Pebble Beach (Main St)','photo',40.7038,-73.9925,'Brooklyn',"Au ras de l'eau : pont de Brooklyn + skyline dans le même cadre."],
 ['Brooklyn Bridge Park — Pier 1','photo',40.7003,-73.9967,'Brooklyn',"Skyline de Lower Manhattan. Meilleur au coucher du soleil."],
 ['Brooklyn Heights Promenade','photo',40.6963,-73.9967,'Brooklyn',"Skyline plein cadre, surélevé, très peu de monde le matin."],
 ["Jane's Carousel",'photo',40.7033,-73.9938,'Brooklyn',"Carrousel dans sa boîte de verre. Reflets au crépuscule."],
+['Tobacco Warehouse','photo',40.7027,-73.9911,'Brooklyn',"Ruine à ciel ouvert intégrée au théâtre St Ann's Warehouse."],
+['Squibb Park Bridge','photo',40.7000,-73.9965,'Brooklyn',"Passerelle en bois qui descend de Brooklyn Heights vers le parc."],
 ['Gantry Plaza State Park','photo',40.7457,-73.9576,'Queens',"Le contre-champ de Midtown depuis Long Island City. Enseigne Pepsi. Sunset."],
 ['Hunters Point South Park','photo',40.7420,-73.9612,'Queens',"Juste à côté de Gantry, moins fréquenté, vue plus large."],
 ['Top of the Rock','photo',40.7593,-73.9794,'Manhattan',"Le seul rooftop d'où l'Empire State est DANS le cadre. Réserver le créneau sunset."],
@@ -379,30 +308,45 @@ const LIB = [
 ['Edge — Hudson Yards','photo',40.7536,-74.0014,'Manhattan',"Plateforme suspendue avec plancher de verre."],
 ['One World Observatory','photo',40.7127,-74.0134,'Manhattan',"Le point le plus haut. Vitres = reflets, prévoir un pare-soleil."],
 ['Staten Island Ferry','photo',40.7013,-74.0134,'Manhattan',"Gratuit. Skyline + Statue de la Liberté depuis l'eau. 25 min, côté tribord à l'aller."],
-['Roosevelt Island Tramway','photo',40.7614,-73.9640,'Manhattan',"Téléphérique au tarif métro. Vue plongeante sur l'East River."],
-['Grand Central Terminal','photo',40.7527,-73.9772,'Manhattan',"Trépied interdit. Le hall depuis la passerelle ouest, vers 10h quand les rais de lumière tombent."],
+['Roosevelt Island Tramway','photo',40.7614,-73.9640,'Manhattan',"Téléphérique au tarif métro (inclus MetroCard). Vue plongeante sur l'East River."],
+['Grand Central Terminal','photo',40.7527,-73.9772,'Manhattan',"Le hall depuis la passerelle ouest, vers 10h quand les rais de lumière tombent. Trépied interdit."],
 ['Oculus (World Trade Center)','photo',40.7115,-74.0113,'Manhattan',"Architecture blanche, lignes fuyantes. Redoutable en noir & blanc."],
 ['Flatiron Building','icon',40.7411,-73.9897,'Manhattan',"Depuis Madison Square Park, ou de face au croisement 23rd/5th."],
 ['Vessel','photo',40.7539,-74.0021,'Manhattan',"Structure en nid d'abeille. Géométrie répétitive."],
 ['Little Island','photo',40.7420,-74.0104,'Manhattan',"Île artificielle sur pilotis en forme de tulipes."],
-['The High Line','park',40.7480,-74.0048,'Manhattan',"Ancienne voie ferrée. 2,3 km. Traverse Chelsea jusqu'à Hudson Yards."],
+['The High Line','park',40.7480,-74.0048,'Manhattan',"Ancienne voie ferrée. 2,3 km. Traverse Chelsea entre Meatpacking et Hudson Yards (~1h)."],
 ['Times Square','icon',40.7580,-73.9855,'Manhattan',"À shooter de nuit. La journée, c'est juste une foule."],
 ['Doyers Street (Chinatown)','photo',40.7143,-73.9979,'Manhattan',"La rue courbe la plus photogénique de Chinatown."],
 ['Wall Street / Charging Bull','icon',40.7056,-74.0134,'Manhattan',"Tôt le matin, sinon impossible de faire le taureau sans dix personnes dessus."],
 ['Manhattan Bridge — passerelle','photo',40.7075,-73.9903,'Manhattan',"Moins connu que Brooklyn Bridge, mais la meilleure vue SUR le pont de Brooklyn."],
-['Brooklyn Bridge (traversée)','icon',40.7061,-73.9969,'Manhattan',"Traverser de Brooklyn vers Manhattan, au lever du soleil."],
+['Brooklyn Bridge (traversée)','icon',40.7061,-73.9969,'Manhattan',"Traverser de Manhattan vers Brooklyn ou l'inverse, ~35 min. Au lever du soleil ou de nuit."],
 ['Bethesda Terrace','photo',40.7740,-73.9709,'Manhattan',"Arcades et plafond de céramique. Souvent un musicien sous la voûte."],
 ['Gapstow Bridge','photo',40.7669,-73.9740,'Manhattan',"Le petit pont de pierre avec les tours de Midtown derrière. Le cliché Central Park."],
 ['Bow Bridge','photo',40.7757,-73.9718,'Manhattan',"Reflets sur le lac au petit matin."],
-['The Bushwick Collective','photo',40.7053,-73.9233,'Brooklyn',"Street art à ciel ouvert sur plusieurs blocs. Métro L → Jefferson St."],
-['Domino Park','photo',40.7144,-73.9679,'Brooklyn',"Ancienne raffinerie de sucre. Structures industrielles + skyline."],
+['The Bushwick Collective','photo',40.7053,-73.9233,'Brooklyn',"Street art à ciel ouvert sur plusieurs blocs. Métro L → Jefferson St. ~1h30."],
+['Domino Park','photo',40.7144,-73.9679,'Brooklyn',"Ancienne raffinerie de sucre. Structures industrielles + skyline. Sunset."],
 ['Transmitter Park (Greenpoint)','photo',40.7300,-73.9613,'Brooklyn',"Ponton en bois face à Midtown. Sunset sans la foule de Dumbo."],
 ['Coney Island','photo',40.5749,-73.9857,'Brooklyn',"Wonder Wheel, boardwalk, néons. ~1h de métro (D/F/N/Q). Une demi-journée entière."],
 ['Unisphere (Flushing Meadows)','photo',40.7466,-73.8446,'Queens',"Le globe d'acier de l'Expo 64. Métro 7 terminus."],
-['Harlem / Apollo Theater','culture',40.8099,-73.9500,'Manhattan',"Enseigne néon iconique. Le quartier autour vaut la marche."],
+['West Village','photo',40.7336,-74.0027,'Manhattan',"Rues pavées : Grove St, Commerce St, Minetta Lane."],
+['Chrysler Building','icon',40.7516,-73.9755,'Manhattan',"Pas de plateforme d'observation — le lobby Art déco vaut le coup d'œil. Se photographie depuis la 3e Av / 44th."],
+['Daily News Building','photo',40.7497,-73.9713,'Manhattan',"Lobby Art déco avec le globe géant — le Daily Planet de Superman."],
+['Pier A','photo',40.7043,-74.0180,'Manhattan',"Ancien embarcadère 1886, au bout de Battery Park."],
+['City Hall / Civic Center','photo',40.7128,-74.0060,'Manhattan',"City Hall + New York County Supreme Court, juste avant la passerelle du pont."],
+['Astor Row','photo',40.8083,-73.9407,'Manhattan',"130th St : maisons à porches en bois, rarissimes à Manhattan."],
+["Striver's Row",'photo',40.8180,-73.9420,'Manhattan',"138th-139th : les plus belles rangées de townhouses de Harlem."],
+
+// Incontournables
+['Statue de la Liberté','icon',40.6892,-74.0445,'Manhattan',"Ferry depuis Battery Park. Réserver le créneau et arriver 45 min avant — sécurité type aéroport."],
+['Ellis Island','culture',40.6995,-74.0396,'Manhattan',"Inclus dans le ferry de la Statue. Musée de l'immigration compris dans le trajet."],
+['Empire State Building','icon',40.7484,-73.9857,'Manhattan',"De nuit depuis la 5e/34th. Pour la vue SUR lui : Top of the Rock ou 230 Fifth."],
+['Rockefeller Center','icon',40.7587,-73.9787,'Manhattan',"Channel Gardens, la patinoire devenue terrasse l'été, Top of the Rock au-dessus."],
+['Columbus Circle','icon',40.7681,-73.9819,'Manhattan',"Entrée sud-ouest de Central Park."],
+['Brookfield Place','icon',40.7130,-74.0154,'Manhattan',"Winter Garden (palmiers sous verrière) + segments du mur de Berlin."],
+['Siège des Nations Unies','culture',40.7489,-73.9680,'Manhattan',"Visite guidée sur réservation, passeport obligatoire. Sinon l'esplanade des drapeaux se voit de la 1re Av."],
 ['Yankee Stadium','icon',40.8296,-73.9262,'Bronx',"Regarde le calendrier : match à domicile = ambiance garantie."],
 
-// ── Streetwear / friperies
+// Streetwear / friperies
 ['Supreme New York','shop',40.7229,-73.9932,'Manhattan',"190 Bowery. File d'attente le jeudi (jour de drop)."],
 ['KITH SoHo','shop',40.7247,-73.9950,'Manhattan',"337 Lafayette St. Le bar à céréales est au fond."],
 ['Aimé Leon Dore','shop',40.7223,-73.9955,'Manhattan',"214 Mulberry St. Café grec à côté, même maison."],
@@ -422,13 +366,16 @@ const LIB = [
 ['Awoke Vintage','shop',40.7175,-73.9603,'Brooklyn',"132 N 5th St. Sélection colorée, bien rangée."],
 ['Artists & Fleas','shop',40.7168,-73.9608,'Brooklyn',"Marché couvert de créateurs, Williamsburg. Week-end."],
 ['Front General Store','shop',40.7027,-73.9884,'Brooklyn',"143 Front St, Dumbo. Vintage japonisant, très bien édité."],
+['Bedford Avenue','shop',40.7171,-73.9569,'Brooklyn',"L'artère de Williamsburg : friperies, disquaires, cafés."],
+["Macy's Herald Square",'shop',40.7508,-73.9890,'Manhattan',"Le grand magasin historique, escalators en bois d'origine."],
+['5e Avenue','shop',40.7620,-73.9740,'Manhattan',"De la 59th à St Patrick : vitrines, le Plaza, l'Apple Cube."],
 
-// ── Musées / culture
-['The Met','culture',40.7794,-73.9632,'Manhattan',"3h minimum. Le rooftop est ouvert l'été. Prix « suggéré » sauf pour les non-résidents."],
-['MoMA','culture',40.7614,-73.9776,'Manhattan',"Gratuit le vendredi 16h–20h — réserver en avance, ça part vite."],
+// Musées / culture
+['The Met','culture',40.7794,-73.9632,'Manhattan',"3h : Great Hall → temple de Dendour (40 min) → peintures européennes (45 min) → armes & armures (20 min) → américain ou impressionnistes (30 min) → rooftop l'été."],
+['MoMA','culture',40.7614,-73.9776,'Manhattan',"Gratuit le vendredi 16h-20h, réserver bien avant. Parcours 2-3h : 5e étage chefs-d'œuvre (Van Gogh, Picasso) → 4e (Dalí, Warhol, Pollock) → jardin de sculptures → design."],
 ['Solomon R. Guggenheim','culture',40.7830,-73.9590,'Manhattan',"La rampe hélicoïdale est le vrai sujet photo, pas les toiles."],
 ['Whitney Museum','culture',40.7396,-74.0089,'Manhattan',"Art américain + terrasses avec vue. Au pied de la High Line."],
-['American Museum of Natural History','culture',40.7813,-73.9740,'Manhattan',"Le nouveau bâtiment Gilder est une bête d'architecture."],
+['American Museum of Natural History','culture',40.7813,-73.9740,'Manhattan',"4h : dinosaures (1h) → baleine bleue (30 min) → Rose Center espace (1h) → minéraux & météorites (45 min) → dioramas africains (45 min). Ouverture 10h."],
 ['The Met Cloisters','culture',40.8649,-73.9319,'Manhattan',"Tout au nord, dans un parc au-dessus de l'Hudson. Dépaysant, calme."],
 ['Brooklyn Museum','culture',40.6712,-73.9636,'Brooklyn',"Moins couru que le Met, collections fortes. Voisin du Botanic Garden."],
 ['MoMA PS1','culture',40.7454,-73.9476,'Queens',"Art contemporain dans une école reconvertie, Long Island City."],
@@ -440,26 +387,41 @@ const LIB = [
 ['New York Public Library','culture',40.7532,-73.9822,'Manhattan',"Rose Main Reading Room. Gratuit. Entrée par les lions."],
 ['Museum of the Moving Image','culture',40.7565,-73.9243,'Queens',"Cinéma, TV, jeu vidéo. Astoria."],
 ['New York Transit Museum','culture',40.6905,-73.9903,'Brooklyn',"Vieilles rames garées dans une station désaffectée. Très photogénique."],
+['Harlem / Apollo Theater','culture',40.8099,-73.9500,'Manhattan',"Enseigne néon iconique + fresques sur la 125th / Frederick Douglass Blvd."],
+['General Grant Memorial','culture',40.8134,-73.9632,'Manhattan',"Le plus grand mausolée d'Amérique du Nord, face à l'Hudson."],
+['Columbia University','culture',40.8075,-73.9626,'Manhattan',"Le campus autour de Low Library, libre d'accès."],
+['Cathedral St John the Divine','culture',40.8038,-73.9618,'Manhattan',"La plus grande cathédrale gothique du monde — toujours inachevée."],
 
-// ── Food
+// Food
 ["Katz's Delicatessen",'food',40.7223,-73.9874,'Manhattan',"205 E Houston. Pastrami. Garde le ticket qu'on te donne à l'entrée."],
 ["Joe's Pizza (Bleecker)",'food',40.7305,-74.0027,'Manhattan',"La part de pizza de référence. Debout, sur le trottoir."],
 ['Levain Bakery','food',40.7794,-73.9805,'Manhattan',"Le cookie. File d'attente mais ça avance vite."],
-['Chelsea Market','food',40.7424,-74.0061,'Manhattan',"Food hall dans une ancienne biscuiterie Nabisco. Los Tacos No.1 au fond."],
+['Chelsea Market','food',40.7424,-74.0061,'Manhattan',"Food hall dans une ancienne biscuiterie Nabisco (l'Oreo est né ici). Los Tacos No.1 au fond."],
 ['Time Out Market','food',40.7024,-73.9930,'Brooklyn',"Dumbo. Rooftop avec vue sur les deux ponts."],
 ["Juliana's Pizza",'food',40.7027,-73.9934,'Brooklyn',"Dumbo, juste sous le pont. Meilleure que Grimaldi's à côté."],
-['Smorgasburg (Williamsburg)','food',40.7215,-73.9615,'Brooklyn',"Samedi seulement, 11h–18h — donc ton samedi 8 août. ~100 stands en plein air."],
+['Smorgasburg (Williamsburg)','food',40.7215,-73.9615,'Brooklyn',"Samedi seulement, 11h-18h — donc ton samedi 8 août. ~100 stands en plein air."],
 ['Peter Pan Donuts','food',40.7248,-73.9505,'Brooklyn',"Greenpoint. Donuts + déco 60's intacte."],
+["Sylvia's Restaurant",'food',40.8086,-73.9439,'Manhattan',"Institution soul food depuis 1962. Poulet frit + gaufres."],
+['230 Fifth Rooftop','food',40.7443,-73.9880,'Manhattan',"Rooftop bar avec l'Empire State en face. Pas de dress code strict en journée."],
+['Koreatown (32nd St)','food',40.7480,-73.9866,'Manhattan',"Une rue dense : BBQ coréen, karaokés, ouvert tard."],
+['Little Italy','food',40.7191,-73.9973,'Manhattan',"Mulberry St. Touristique, mais les guirlandes font de bonnes photos de nuit."],
 
-// ── Parcs
+// Parcs
 ['Central Park','park',40.7812,-73.9665,'Manhattan',"Louer un vélo pour la boucle nord si tu veux la couvrir vraiment."],
 ['Washington Square Park','park',40.7308,-73.9973,'Manhattan',"L'arche, les joueurs d'échecs, le piano. Du street toute la journée."],
+['Bryant Park','park',40.7536,-73.9832,'Manhattan',"Adossé à la NYPL. Le soir, la pelouse face aux tours éclairées."],
+['Union Square','park',40.7359,-73.9911,'Manhattan',"Greenmarket lun/mer/ven/sam. Skaters côté sud."],
+['Madison Square Park','park',40.7414,-73.9880,'Manhattan',"Face au Flatiron. Shake Shack originel dans le parc."],
+['Battery Park','park',40.7033,-74.0170,'Manhattan',"Départ des ferries pour la Statue. Castle Clinton = retrait des billets."],
+['Four Freedoms Park','park',40.7500,-73.9610,'Manhattan',"Pointe sud de Roosevelt Island. Smallpox Hospital et Cornell Tech en remontant."],
 ['Prospect Park','park',40.6602,-73.9690,'Brooklyn',"Le Central Park de Brooklyn, par les mêmes architectes. Plus sauvage."],
 ['Green-Wood Cemetery','park',40.6579,-73.9940,'Brooklyn',"Collines, vue sur Manhattan, perruches sauvages nichées dans le portail."],
-['Rockaway Beach','park',40.5832,-73.8155,'Queens',"Vraie plage, accessible en métro A. Une journée entière."]
+['Rockaway Beach','park',40.5832,-73.8155,'Queens',"Vraie plage, accessible en métro A. Une journée entière."],
+['Marcus Garvey Park','park',40.8044,-73.9440,'Manhattan',"Tour de guet en fonte au sommet, unique à NYC."],
+['Morningside Park','park',40.8050,-73.9590,'Manhattan',"Cascade + falaise, entre Harlem et Columbia."]
 ];
 
-/* ═══════════ 2. Les 8 jours ═══════════ */
+/* ═══════════ 2. Jours & couleurs (lignes MTA) ═══════════ */
 const LINES = ['#EE352E','#00933C','#0039A6','#FF6319','#FCCC0A','#B933AD','#6CBE45','#996633'];
 const INK   = ['#fff','#fff','#fff','#fff','#000','#fff','#000','#fff'];
 const DAYS = [
@@ -468,55 +430,188 @@ const DAYS = [
   ['2026-08-08','Sam 8','06:00','20:02'], ['2026-08-09','Dim 9','06:01','20:01'],
   ['2026-08-10','Lun 10','06:02','19:59'], ['2026-08-11','Mar 11','06:03','19:58']
 ];
-const KEY = 'nyc-aout-2026-v1';
+const KEY = 'nyc-aout-2026-v2';
+const IMG_KEY = 'nyc-img-v1';
+const THEME_KEY = 'nyc-theme';
 const uid = () => Math.random().toString(36).slice(2,9);
 
-let S = {
-  days: DAYS.map((d,i) => ({date:d[0], title:'', note:'', stops:[]})),
-  active: 0, showAll: false
-};
+/* ═══════════ 3. Itinéraire pré-rempli (d'après ton brief) ═══════════ */
+function P(name, time, note){
+  const l = LIB.find(x => x[0] === name);
+  if(!l) return {id:uid(), name, cat:'custom', lat:null, lng:null, area:'', note:note||'', time:time||'', done:false};
+  return {id:uid(), name:l[0], cat:l[1], lat:l[2], lng:l[3], area:l[4], note:(note!==undefined?note:l[5]), time:time||'', done:false};
+}
+function C(name, cat, lat, lng, time, note){
+  return {id:uid(), name, cat, lat, lng, area:'', note:note||'', time:time||'', done:false};
+}
+function defaultDays(){ return [
+  {date:DAYS[0][0], title:'Arrivée — Midtown', note:"Premier soir : boucle à pied ~1h30 depuis Grand Central. L'ONU selon l'heure d'arrivée.", stops:[
+    P('Grand Central Terminal','18:00'), P('Chrysler Building',''), P('Daily News Building',''),
+    P('Siège des Nations Unies','', "À confirmer selon l'heure — l'esplanade des drapeaux se voit de la 1re Av."),
+    P('Bryant Park',''), P('New York Public Library',''), P('Rockefeller Center',''),
+    P('Summit One Vanderbilt','', "Option premier soir si l'énergie suit — sinon à recaser."),
+    P('Times Square','21:30', "De nuit, à la fin de la boucle.")
+  ]},
+  {date:DAYS[1][0], title:'Downtown & Statue', note:"Réserver le créneau ferry 9h30 à l'avance. Sécurité type aéroport à Battery Park.", stops:[
+    P('Battery Park','08:45'), P('Statue de la Liberté','09:30'), P('Ellis Island',''),
+    P('Wall Street / Charging Bull','13:30'), P('9/11 Memorial & Museum','14:30'),
+    P('One World Observatory','16:00'), P('Oculus (World Trade Center)',''),
+    P('Brookfield Place',''), P('Pier A','', "Fin de journée au bord de l'eau.")
+  ]},
+  {date:DAYS[2][0], title:'Central Park & musées', note:"AMNH ouvre à 10h, compter 4h. Puis téléphérique (inclus MetroCard) et Top of the Rock au sunset — réserver.", stops:[
+    P('Columbus Circle','09:15'), P('American Museum of Natural History','10:00'),
+    P('Central Park','14:30', "Bethesda Terrace, Bow Bridge, le Mall — entre le musée et la 5e Av."),
+    P('5e Avenue',''), P('Roosevelt Island Tramway','16:30', "Sens Manhattan → Roosevelt. Inclus dans la MetroCard."),
+    P('Four Freedoms Park',''), P('Top of the Rock','19:15', "Créneau sunset (coucher 20:05). Réserver.")
+  ]},
+  {date:DAYS[3][0], title:'Greenwich & High Line', note:"Bloc « Lower Manhattan » du brief — pas encore daté, je l'ai posé là. Vendredi = MoMA gratuit 16h-20h.", stops:[
+    P('Washington Square Park','09:30'), P('West Village',''),
+    P('Whitney Museum',''), P('The High Line','11:30'), P('Chelsea Market','12:45', "Déjeuner — Los Tacos No.1 au fond. L'Oreo est né ici."),
+    P('Vessel',''), P('Edge — Hudson Yards',''),
+    P('MoMA','16:30', "Vendredi gratuit 16h-20h — réserver en ligne bien avant. 5e étage chefs-d'œuvre → 4e → jardin de sculptures."),
+    P('Koreatown (32nd St)','19:30'), P('Empire State Building','21:00', "De nuit."),
+    P('230 Fifth Rooftop','', "Un verre avec l'Empire State en face.")
+  ]},
+  {date:DAYS[4][0], title:'Brooklyn → Williamsburg', note:"La journée la plus réglée du brief. Smorgasburg le samedi 11h-18h si tu veux caler le déjeuner là-bas.", stops:[
+    P('City Hall / Civic Center','08:30', "20 min de métro. City Hall + Supreme Court avant la passerelle."),
+    P('Brooklyn Bridge (traversée)','08:45', "~35 min, vers Brooklyn."),
+    P('Brooklyn Heights Promenade','09:30', "Boucle ~1h30 : Montague → Remsen → Pierrepont → promenade → Willow St → 24 Middagh → Plymouth Church."),
+    P('Squibb Park Bridge',''), P('Tobacco Warehouse',''), P("Jane's Carousel",''),
+    P('Pebble Beach (Main St)',''), P('Dumbo — Washington St',''),
+    P('Time Out Market','12:30', "Déjeuner — ou Juliana's juste en dessous."),
+    C('NYC Ferry → Williamsburg','icon',40.7042,-73.9936,'14:00',"~45 min de balade sur l'eau, ligne East River."),
+    P('Bedford Avenue','15:00'), P('10ft Single by Stella Dallas',''),
+    P('The Bushwick Collective','16:30', "15 min de métro L. ~1h30 sur place."),
+    P('Domino Park','19:30', "Coucher de soleil (20:02) + dîner."),
+    C('Retour : pont de nuit ou métro','custom',null,null,'',"Brooklyn Bridge de nuit si l'énergie suit, sinon métro L direct.")
+  ]},
+  {date:DAYS[5][0], title:'Queens & Roosevelt', note:"Bloc « Queens » du brief — à confirmer.", stops:[
+    P('MoMA PS1','12:00'), P('Gantry Plaza State Park','', "L'enseigne Pepsi + le contre-champ de Midtown."),
+    P('Hunters Point South Park',''),
+    P('Roosevelt Island Tramway','', "Cette fois dans le sens Roosevelt → Manhattan."),
+    P("Macy's Herald Square",'')
+  ]},
+  {date:DAYS[6][0], title:'Harlem', note:"Boucle du brief : ~25 min de métro depuis Midtown, puis tout à pied. Retour par Central Park.", stops:[
+    P('Marcus Garvey Park','09:30'), P('Astor Row',''),
+    P("Sylvia's Restaurant",'12:30', "Déjeuner. Institution soul food depuis 1962."),
+    P('Harlem / Apollo Theater',''), P("Striver's Row",''),
+    P('General Grant Memorial',''), P('Columbia University',''),
+    P('Cathedral St John the Divine',''), P('Morningside Park','', "Redescendre par le parc, puis Central Park.")
+  ]},
+  {date:DAYS[7][0], title:'Départ', note:"Vol retour. Garder la matinée souple — dernier bagel, dernières courses.", stops:[]}
+];}
 
-/* ═══════════ 3. Persistance ═══════════ */
-let saveTimer;
+let S = { days: defaultDays(), active: 0, showAll: false };
+
+/* ═══════════ 4. Stockage (app iPhone : localStorage · aperçu Claude : window.storage) ═══════════ */
 const store = {
   async set(k,v){
-    if(window.storage) { try { return await window.storage.set(k,v); } catch(e){} }
-    localStorage.setItem(k,v);
+    if(window.storage){ try{ return await window.storage.set(k,v); }catch(e){} }
+    try{ localStorage.setItem(k,v); }catch(e){}
   },
   async get(k){
-    if(window.storage) { try { const r = await window.storage.get(k); if(r && r.value) return r.value; } catch(e){} }
-    return localStorage.getItem(k);
+    if(window.storage){ try{ const r = await window.storage.get(k); if(r && r.value) return r.value; }catch(e){} }
+    try{ return localStorage.getItem(k); }catch(e){ return null; }
   }
 };
+let saveTimer;
 function save(){
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    try { await store.set(KEY, JSON.stringify({days:S.days})); }
-    catch(e){ console.error('sauvegarde', e); }
-  }, 400);
+  saveTimer = setTimeout(() => store.set(KEY, JSON.stringify({days:S.days})), 400);
 }
 async function load(){
-  try {
+  try{
     const v = await store.get(KEY);
-    if(v){
-      const d = JSON.parse(v);
-      if(d.days && d.days.length === 8) S.days = d.days;
-    }
-  } catch(e){ /* première ouverture */ }
+    if(v){ const d = JSON.parse(v); if(d.days && d.days.length === 8) S.days = d.days; }
+  }catch(e){}
 }
 
-/* ═══════════ 4. Utilitaires ═══════════ */
+/* ═══════════ 5. Utilitaires ═══════════ */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const day = () => S.days[S.active];
 const col = i => LINES[i];
-function toast(msg){
-  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), 1600);
-}
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 1600); }
 function autosize(el){ el.style.height='auto'; el.style.height = el.scrollHeight+'px'; }
 
-/* ═══════════ 5. Rail des jours ═══════════ */
+/* ═══════════ 6. Photos (Wikipédia — géosearch puis recherche texte) ═══════════ */
+let imgCache = {};
+let imgSaveT;
+function saveImgCache(){ clearTimeout(imgSaveT); imgSaveT = setTimeout(() => store.set(IMG_KEY, JSON.stringify(imgCache)), 900); }
+async function loadImgCache(){ try{ const v = await store.get(IMG_KEY); if(v) imgCache = JSON.parse(v); }catch(e){} }
+
+const IMG_PENDING = {};
+const WIKI = 'https://en.wikipedia.org/w/api.php';
+const words = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').match(/[a-z0-9]{3,}/g) || [];
+
+function pickPage(pages, name){
+  const nw = new Set(words(name));
+  let best = null, bestScore = -1;
+  for(const p of pages){
+    if(!p.thumbnail) continue;
+    const score = words(p.title).reduce((a,w) => a + (nw.has(w) ? 1 : 0), 0);
+    if(score > bestScore){ best = p; bestScore = score; }
+  }
+  if(best && bestScore > 0) return best.thumbnail.source;
+  // aucun titre ne matche : on prend la page illustrée la plus proche (1er résultat)
+  const first = pages.find(p => p.thumbnail);
+  return first ? first.thumbnail.source : null;
+}
+async function wikiJson(params){
+  const u = WIKI + '?origin=*&format=json&action=query&' + params;
+  const r = await fetch(u);
+  return r.json();
+}
+function spotImg(spot, cb){
+  const key = spot.name;
+  if(imgCache[key] !== undefined){ cb(imgCache[key]); return; }
+  if(IMG_PENDING[key]){ IMG_PENDING[key].push(cb); return; }
+  IMG_PENDING[key] = [cb];
+  const done = url => {
+    imgCache[key] = url || null; saveImgCache();
+    (IMG_PENDING[key]||[]).forEach(f => f(url || null)); delete IMG_PENDING[key];
+  };
+  (async () => {
+    try{
+      let url = null;
+      if(spot.lat != null){
+        const d = await wikiJson(`generator=geosearch&ggscoord=${spot.lat}%7C${spot.lng}&ggsradius=400&ggslimit=8&prop=pageimages&piprop=thumbnail&pithumbsize=560`);
+        const pages = d.query && d.query.pages ? Object.values(d.query.pages) : [];
+        url = pickPage(pages, key);
+      }
+      if(!url){
+        const q = key.replace(/—.*$/,'').replace(/\(.*?\)/g,'').trim();
+        const d = await wikiJson(`generator=search&gsrsearch=${encodeURIComponent(q + ' New York')}&gsrlimit=3&prop=pageimages&piprop=thumbnail&pithumbsize=560`);
+        const pages = d.query && d.query.pages ? Object.values(d.query.pages) : [];
+        url = pickPage(pages, key);
+      }
+      done(url);
+    }catch(e){ done(null); }
+  })();
+}
+/* chargement paresseux : seules les vignettes visibles déclenchent une requête */
+const io = ('IntersectionObserver' in window) ? new IntersectionObserver(es => {
+  es.forEach(en => {
+    if(!en.isIntersecting) return;
+    io.unobserve(en.target);
+    const el = en.target;
+    const sp = { name: el.dataset.img, lat: el.dataset.lat ? +el.dataset.lat : null, lng: el.dataset.lng ? +el.dataset.lng : null };
+    spotImg(sp, url => { if(url){ el.style.backgroundImage = `url("${url}")`; el.classList.add('has'); } });
+  });
+}, {rootMargin:'150px'}) : null;
+function watchThumbs(root){
+  (root || document).querySelectorAll('.thumb[data-img]:not(.seen)').forEach(el => {
+    el.classList.add('seen');
+    if(io) io.observe(el);
+    else spotImg({name:el.dataset.img, lat:el.dataset.lat?+el.dataset.lat:null, lng:el.dataset.lng?+el.dataset.lng:null},
+      url => { if(url){ el.style.backgroundImage=`url("${url}")`; el.classList.add('has'); } });
+  });
+}
+function thumbHtml(name, cat, lat, lng){
+  return `<div class="thumb" data-img="${esc(name)}" ${lat!=null?`data-lat="${lat}" data-lng="${lng}"`:''}>${CATS[cat].icon}</div>`;
+}
+
+/* ═══════════ 7. Rail des jours ═══════════ */
 function drawRail(){
   $('#rail').innerHTML = S.days.map((d,i) => {
     const n = d.stops.length;
@@ -527,66 +622,76 @@ function drawRail(){
   }).join('');
 }
 
-/* ═══════════ 6. Panneau du jour ═══════════ */
+/* ═══════════ 8. Panneau du jour ═══════════ */
 function drawDay(){
   const i = S.active, d = day(), c = col(i);
   $('#chip').style.background = c;
   $('#eyeText').textContent = `Jour ${i+1} · ${DAYS[i][1]} août`;
   $('#dayTitle').value = d.title;
   $('#dayNote').value = d.note; autosize($('#dayNote'));
-  $('#sun').innerHTML = `<span>LEVER <b>${DAYS[i][2]}</b></span><span>COUCHER <b>${DAYS[i][3]}</b></span><span>GOLDEN HOUR <b>≈${(parseInt(DAYS[i][3])-1)}:${DAYS[i][3].slice(3)} → ${DAYS[i][3]}</b></span>`;
+  $('#sun').innerHTML = `<span>LEVER <b>${DAYS[i][2]}</b></span><span>COUCHER <b>${DAYS[i][3]}</b></span><span>GOLDEN H. <b>≈${(parseInt(DAYS[i][3])-1)}:${DAYS[i][3].slice(3)} → ${DAYS[i][3]}</b></span>`;
 
   const box = $('#stops');
   if(!d.stops.length){
-    box.innerHTML = `<div class="empty">Aucun spot pour ce jour.<br>Pioche dans la bibliothèque (${LIB.length} adresses déjà géolocalisées) ou crée la tienne.</div>`;
+    box.innerHTML = `<div class="empty">Aucun spot pour ce jour.<br>Pioche dans la bibliothèque (${LIB.length} adresses géolocalisées) ou crée la tienne.</div>`;
     return;
   }
   box.innerHTML = d.stops.map((s,j) => `
-    <div class="stop ${s.done?'done':''}" data-i="${j}" style="color:${c}">
+    <div class="stop ${s.done?'done':''}" style="color:${c}">
       <div class="track"><i></i><u></u></div>
       <div class="body">
         <div class="row1">
           <input class="time-in" data-f="time" data-i="${j}" value="${esc(s.time||'')}" placeholder="--:--" maxlength="5">
           <input class="name" data-f="name" data-i="${j}" value="${esc(s.name)}">
           <span class="acts">
-            <button data-a="up" data-i="${j}" title="Monter">↑</button>
-            <button data-a="down" data-i="${j}" title="Descendre">↓</button>
-            <button data-a="done" data-i="${j}" title="Fait">✓</button>
-            <button data-a="del" data-i="${j}" title="Supprimer">×</button>
+            <button data-a="up" data-i="${j}" aria-label="Monter">↑</button>
+            <button data-a="down" data-i="${j}" aria-label="Descendre">↓</button>
+            <button data-a="done" data-i="${j}" aria-label="Fait">✓</button>
+            <button data-a="del" data-i="${j}" aria-label="Supprimer">×</button>
           </span>
         </div>
         <div class="tags">
           <span class="cat">${CATS[s.cat].icon} ${CATS[s.cat].label}</span>
-          <span>${s.area || (s.lat ? 'Repère posé' : 'Sans repère')}</span>
+          <span>${s.area || (s.lat != null ? 'Repère posé' : 'Sans repère')}</span>
         </div>
         <textarea class="snote" data-f="note" data-i="${j}" rows="1" placeholder="Ta note…">${esc(s.note||'')}</textarea>
       </div>
+      ${thumbHtml(s.name, s.cat, s.lat, s.lng)}
     </div>`).join('');
   box.querySelectorAll('.snote').forEach(autosize);
+  watchThumbs(box);
 }
 
 function render(){ drawRail(); drawDay(); drawMap(true); save(); }
 
-/* ═══════════ 7. Carte ═══════════ */
-let map, layer, tileFails = 0;
-function initMap(){
-  map = L.map('map', {zoomControl:true, attributionControl:true}).setView([40.72,-73.97], 12);
-  const carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution:'© OpenStreetMap · © CARTO', subdomains:'abcd', maxZoom:19
-  });
-  carto.on('tileerror', () => {
-    if(++tileFails === 6){
-      map.removeLayer(carto);
-      const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:'© OpenStreetMap', maxZoom:19
-      });
+/* ═══════════ 9. Carte ═══════════ */
+let map, layer, tileDark, tileLight, curTile;
+function makeTile(style){
+  const t = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`,
+    {attribution:'© OpenStreetMap · © CARTO', subdomains:'abcd', maxZoom:19});
+  let fails = 0;
+  t.on('tileerror', () => {
+    if(++fails === 6 && curTile === t){
+      map.removeLayer(t);
+      const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19});
       let f2 = 0;
       osm.on('tileerror', () => { if(++f2 === 6) $('#paneMap').classList.add('off'); });
-      osm.addTo(map);
+      osm.addTo(map); curTile = osm;
     }
   });
-  carto.addTo(map);
+  return t;
+}
+function initMap(){
+  map = L.map('map', {zoomControl:true}).setView([40.72,-73.97], 12);
+  tileDark = makeTile('dark_all'); tileLight = makeTile('light_all');
+  curTile = (theme === 'light') ? tileLight : tileDark;
+  curTile.addTo(map);
   layer = L.layerGroup().addTo(map);
+}
+function popupHtml(s, i, url){
+  return `${url ? `<div class="pop-img" style="background-image:url('${url}')"></div>` : ''}
+    <div class="pop-tx"><b>${esc(s.name)}</b><em>Jour ${i+1} · ${esc(CATS[s.cat].label)}</em>
+    ${s.note ? `<p>${esc(s.note)}</p>` : ''}</div>`;
 }
 function drawMap(fit){
   if(!map) return;
@@ -601,29 +706,45 @@ function drawMap(fit){
       path.push([s.lat, s.lng]);
       if(here) pts.push([s.lat, s.lng]);
       const size = here ? 26 : 16;
-      L.marker([s.lat, s.lng], {
+      const m = L.marker([s.lat, s.lng], {
         zIndexOffset: here ? 1000 : 0,
-        icon: L.divIcon({
-          className:'', iconSize:[size,size], iconAnchor:[size/2,size/2],
-          html:`<div class="mk ${here?'':'faded mini'}" style="background:${c};color:${INK[i]};width:${size}px;height:${size}px">${here?j+1:''}</div>`
-        })
-      }).addTo(layer).bindPopup(
-        `<b>${esc(s.name)}</b><em>Jour ${i+1} · ${esc(CATS[s.cat].label)}</em>` +
-        (s.note ? `<div style="margin-top:6px">${esc(s.note)}</div>` : '')
-      );
+        icon: L.divIcon({className:'', iconSize:[size,size], iconAnchor:[size/2,size/2],
+          html:`<div class="mk ${here?'':'faded mini'}" style="background:${c};color:${INK[i]};width:${size}px;height:${size}px">${here?j+1:''}</div>`})
+      }).addTo(layer);
+      m.bindPopup(popupHtml(s, i, imgCache[s.name] || null));
+      m.on('popupopen', e => {
+        spotImg(s, url => { if(url && m.isPopupOpen()) e.popup.setContent(popupHtml(s, i, url)); });
+      });
     });
     if(path.length > 1)
       L.polyline(path, {color:c, weight: here?2.5:1.5, opacity: here?.85:.2, dashArray:'1 6', lineCap:'round'}).addTo(layer);
   });
-  if(fit && pts.length) map.fitBounds(pts, {padding:[60,60], maxZoom:15});
+  if(fit && pts.length) map.fitBounds(pts, {padding:[56,56], maxZoom:15});
 }
 
-/* ═══════════ 8. Tiroir : bibliothèque ═══════════ */
+/* ═══════════ 10. Thème ═══════════ */
+let theme = 'dark';
+function setTheme(t){
+  theme = t;
+  if(t === 'light') $('#app').dataset.theme = 'light';
+  else delete $('#app').dataset.theme;
+  $('#btnTheme').textContent = (t === 'light') ? 'Nuit' : 'Papier';
+  document.querySelector('meta[name="theme-color"]').content = (t === 'light') ? '#FAF9F5' : '#000000';
+  if(map && curTile !== ((t==='light') ? tileLight : tileDark)){
+    map.removeLayer(curTile);
+    curTile = (t === 'light') ? tileLight : tileDark;
+    curTile.addTo(map);
+  }
+  store.set(THEME_KEY, t);
+}
+
+/* ═══════════ 11. Tiroir : bibliothèque ═══════════ */
 let filter = 'all', q = '';
 function openLib(){
   $('#drawer').innerHTML = `
+    <div class="grab"></div>
     <div class="dhead">
-      <div class="r"><h2>Bibliothèque · ${LIB.length} spots</h2><button class="tool" data-close>Fermer</button></div>
+      <div class="r"><h2>Bibliothèque · ${LIB.length}</h2><button class="close" data-close>Fermer</button></div>
       <input class="search" id="q" placeholder="Chercher un lieu, un quartier…" value="${esc(q)}">
       <div class="filters" id="filters">
         ${['all','photo','shop','culture','icon','food','park'].map(k =>
@@ -633,7 +754,6 @@ function openLib(){
     <div class="list" id="list"></div>`;
   $('#scrim').classList.add('on');
   drawList();
-  $('#q').focus();
   $('#q').oninput = e => { q = e.target.value; drawList(); };
   $('#filters').onclick = e => {
     const b = e.target.closest('[data-f]'); if(!b) return;
@@ -652,11 +772,12 @@ function drawList(){
   $('#list').innerHTML = rows.length ? rows.map(l => {
     const k = LIB.indexOf(l);
     return `<button class="item ${used.has(l[0])?'used':''}" data-k="${k}">
-      <span class="ic">${CATS[l[1]].icon}</span>
+      ${thumbHtml(l[0], l[1], l[2], l[3])}
       <span class="t"><b>${esc(l[0])}</b><i>${esc(l[4])} · ${esc(CATS[l[1]].label)}</i><p>${esc(l[5])}</p></span>
       <span class="add">＋</span>
     </button>`;
   }).join('') : `<div class="empty" style="margin:20px 16px">Rien ne correspond. Essaie un autre mot, ou crée le spot toi-même.</div>`;
+  watchThumbs($('#list'));
   $('#list').onclick = e => {
     const b = e.target.closest('[data-k]'); if(!b) return;
     const l = LIB[+b.dataset.k];
@@ -667,18 +788,19 @@ function drawList(){
   };
 }
 
-/* ═══════════ 9. Tiroir : spot perso ═══════════ */
+/* ═══════════ 12. Tiroir : spot perso ═══════════ */
 function openCustom(){
   $('#drawer').innerHTML = `
-    <div class="dhead"><div class="r"><h2>Créer un spot</h2><button class="tool" data-close>Fermer</button></div></div>
+    <div class="grab"></div>
+    <div class="dhead"><div class="r"><h2>Créer un spot</h2><button class="close" data-close>Fermer</button></div></div>
     <div class="form">
       <div class="field"><label>Nom</label><input id="cName" placeholder="ex. Rooftop du Wythe Hotel"></div>
       <div class="field"><label>Catégorie</label>
-        <div class="filters" id="cCat">${Object.keys(CATS).map((k,i) =>
-          `<button class="f ${i===0?'on':''}" data-c="${k}">${CATS[k].icon} ${CATS[k].label}</button>`).join('')}</div>
+        <div class="filters" id="cCat">${Object.keys(CATS).map(k =>
+          `<button class="f ${k==='custom'?'on':''}" data-c="${k}">${CATS[k].icon} ${CATS[k].label}</button>`).join('')}</div>
       </div>
       <div class="field"><label>Coordonnées (optionnel)</label><input id="cGps" placeholder="40.7218, -73.9580"></div>
-      <div class="hint">Sur Google Maps : clic droit sur le lieu → les coordonnées s'affichent en haut du menu, un clic les copie. Sans coordonnées, le spot reste dans la liste mais pas sur la carte.</div>
+      <div class="hint">Sur Google Maps : appui long sur le lieu → les coordonnées s'affichent, un appui les copie. Sans coordonnées, le spot reste dans la liste mais pas sur la carte.</div>
       <div class="field"><label>Note</label><textarea id="cNote" placeholder="Horaires, réservation, ce que tu veux y shooter…"></textarea></div>
       <button class="submit" id="cAdd">Ajouter au jour ${S.active+1}</button>
     </div>`;
@@ -689,22 +811,17 @@ function openCustom(){
     cat = b.dataset.c;
     $('#cCat').querySelectorAll('.f').forEach(x => x.classList.toggle('on', x.dataset.c===cat));
   };
-  $('#cCat').querySelectorAll('.f').forEach(x => x.classList.toggle('on', x.dataset.c==='custom'));
-  $('#cName').focus();
   $('#cAdd').onclick = () => {
     const name = $('#cName').value.trim();
     if(!name){ $('#cName').focus(); toast('Il manque le nom'); return; }
     const m = $('#cGps').value.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
-    day().stops.push({
-      id:uid(), name, cat, lat: m?+m[1]:null, lng: m?+m[2]:null,
-      area:'', note: $('#cNote').value.trim(), time:'', done:false
-    });
+    day().stops.push({id:uid(), name, cat, lat:m?+m[1]:null, lng:m?+m[2]:null, area:'', note:$('#cNote').value.trim(), time:'', done:false});
     render(); closeDrawer(); toast('Spot créé');
   };
 }
 function closeDrawer(){ $('#scrim').classList.remove('on'); }
 
-/* ═══════════ 10. Export ═══════════ */
+/* ═══════════ 13. Export ═══════════ */
 function exportTxt(){
   let out = `NEW YORK — 4 au 11 août 2026\n${'='.repeat(34)}\n`;
   S.days.forEach((d,i) => {
@@ -725,7 +842,7 @@ function exportTxt(){
   toast('Fichier téléchargé');
 }
 
-/* ═══════════ 11. Événements ═══════════ */
+/* ═══════════ 14. Événements ═══════════ */
 $('#rail').onclick = e => {
   const b = e.target.closest('[data-day]'); if(!b) return;
   S.active = +b.dataset.day; render();
@@ -754,7 +871,10 @@ $('#stops').addEventListener('click', e => {
 $('#btnLib').onclick = openLib;
 $('#btnCustom').onclick = openCustom;
 $('#btnExport').onclick = exportTxt;
-$('#scrim').onclick = e => { if(e.target === $('#scrim') || e.target.closest('[data-close]')) closeDrawer(); };
+$('#btnTheme').onclick = () => setTheme(theme === 'light' ? 'dark' : 'light');
+$('#scrim').addEventListener('click', e => {
+  if(e.target === $('#scrim') || e.target.closest('[data-close]')) closeDrawer();
+});
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDrawer(); });
 
 $('#btnFit').onclick = () => drawMap(true);
@@ -770,19 +890,21 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   if(b.dataset.pane === 'map' && map){ map.invalidateSize(); drawMap(true); }
 });
 
-/* countdown */
 (function cd(){
   const days = Math.ceil((new Date('2026-08-04T00:00:00') - new Date()) / 864e5);
-  $('#cd').textContent = days > 0 ? `J−${days}` : (days === 0 ? 'AUJOURD’HUI' : 'EN COURS');
+  $('#cd').textContent = days > 0 ? `J−${days}` : (days === 0 ? "AUJOURD'HUI" : 'EN COURS');
 })();
 
-/* ═══════════ 12. Mode hors ligne ═══════════ */
+/* ═══════════ 15. Mode hors ligne ═══════════ */
 if('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
 
-/* ═══════════ 13. Démarrage ═══════════ */
+/* ═══════════ 16. Démarrage ═══════════ */
 (async () => {
+  await loadImgCache();
+  const t = await store.get(THEME_KEY);
+  setTheme(t === 'light' ? 'light' : 'dark');
   await load();
   initMap();
   render();
