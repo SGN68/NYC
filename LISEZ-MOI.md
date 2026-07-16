@@ -57,23 +57,30 @@ la nouvelle version arrive à la prochaine ouverture avec du réseau. Si ça coi
 
 ---
 
-## Mise à jour v4 — nouveau fond de carte, magasins, carte d'ensemble, itinéraires
+## Mise à jour v5 — hôtel, transports, budget, météo, mode Jour J, édition simplifiée
 
-Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html`, `sw.js`
-(les icônes et le manifeste n'ont pas changé cette fois) → *Commit changes*.
+Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html` et `sw.js`
+(icônes et manifeste inchangés) → *Commit changes*.
 
 Ce qui change :
-- Fond de carte remplacé (CARTO Voyager, plus lisible) — l'ancien satellite est retiré.
-- 14 nouveaux magasins ajoutés à la bibliothèque (130 lieux au total), casés dans les
-  jours 4 (grosse matinée shopping SoHo/LES/NoHo) et 5 (Bushwick).
-- Chaque catégorie a son icône sur la carte (🛍️ pour les magasins, etc.).
-- Nouvelle carte « Voir la carte » sur l'écran d'accueil (même format que les jours) :
-  affiche tous les lieux de la bibliothèque avec des filtres par catégorie, sans notion
-  de jour précis.
-- Bouton « Itinéraire ↗ » sur chaque lieu (étapes de jour, bibliothèque, bulles de carte)
-  qui ouvre directement Apple Plans avec le lieu pré-rempli.
-- Balayage latéral de l'écran bloqué (le geste ne fait plus glisser toute l'app sur le côté).
-- Badges « ★ Incontournable » sur les lieux à ne pas rater.
+- **The Renwick Hotel** est maintenant un point fixe sur toutes les cartes (icône 🏨).
+  Chaque jour part de l'hôtel et y revient, avec un mode de trajet suggéré
+  (à pied / métro / Uber-taxi) et une durée estimée — à vol d'oiseau, pas un vrai
+  calcul d'itinéraire MTA, c'est indiqué dans le texte.
+- **Double tracé sur la carte du jour** : un trait clair relie l'hôtel et l'itinéraire
+  principal (musées, incontournables, food, parcs) ; un trait violet pointillé relie
+  chaque magasin et spot photo au point le plus proche de cet itinéraire. Légende en
+  bas à gauche de la carte.
+- **Météo réelle** par jour (Open-Meteo, gratuit) à côté du lever/coucher de soleil —
+  n'apparaît qu'à l'approche du voyage (fenêtre de prévision ~16 jours).
+- **Budget** : champ optionnel par lieu, total automatique affiché en haut de chaque jour.
+- **Mode Jour J** : bouton qui estompe les lieux déjà cochés pour se concentrer sur
+  ce qu'il reste à faire.
+- **Édition par crayon** : les noms et notes des lieux ne sont plus des champs toujours
+  actifs — un tap sur le ✎ ouvre l'édition, un tap ailleurs la referme. Plus de clavier
+  qui surgit par erreur en sélectionnant un lieu.
+- **Boutons agrandis** partout (zones tactiles ≥ 40-44px) pour un usage au pouce plus
+  confortable sur iPhone.
 
-⚠️ Le service worker recharge le nouveau fond de carte : ouvre l'app en wifi une première
-fois après la mise à jour pour que les nouvelles tuiles soient mises en cache avant le vol.
+⚠️ Après la mise à jour, ouvre l'app en wifi une première fois pour que le service
+worker recharge la nouvelle version en cache.

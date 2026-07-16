@@ -94,6 +94,13 @@ a{color:var(--accent); text-decoration:none}
 .leaflet-container{background:#2B3A2E; font-family:var(--sans)}
 .mtop{position:absolute; top:calc(14px + env(safe-area-inset-top)); left:0; right:0; z-index:500;
   display:flex; align-items:center; justify-content:space-between; padding:0 18px; pointer-events:none}
+.mlegend{position:absolute; bottom:10px; left:14px; z-index:500; display:flex; flex-direction:column; gap:4px;
+  background:rgba(252,249,241,.9); backdrop-filter:blur(6px); padding:8px 11px; border-radius:12px;
+  box-shadow:0 4px 12px -4px rgba(0,0,0,.3); pointer-events:none}
+.mlegend span{display:flex; align-items:center; gap:6px; font-size:10px; font-weight:600; color:var(--ink)}
+.mlegend .lin{width:16px; height:2px; border-radius:2px}
+.mlegend .lin-main{background:repeating-linear-gradient(90deg,#B8B098 0 4px, transparent 4px 7px)}
+.mlegend .lin-side{background:repeating-linear-gradient(90deg,#8A5A9E 0 3px, transparent 3px 5px)}
 .mtop > *{pointer-events:auto}
 .circ{width:40px; height:40px; border-radius:50%; background:rgba(252,249,241,.92); backdrop-filter:blur(6px);
   display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px -4px rgba(0,0,0,.35);
@@ -135,10 +142,45 @@ a{color:var(--accent); text-decoration:none}
 .grab{width:40px; height:5px; background:var(--soft); border-radius:3px; margin:0 auto 14px}
 .sheet h2{font-family:var(--serif); font-size:30px; font-weight:600; margin:4px 0 0; letter-spacing:-.5px}
 .dnote{font-size:13px; color:var(--muted); line-height:1.5; margin-top:8px; resize:none; overflow:hidden}
-.sun{display:flex; gap:14px; margin-top:12px; font-size:11px; color:var(--muted); font-weight:500; flex-wrap:wrap}
+.sun{display:flex; gap:14px; margin-top:12px; font-size:11px; color:var(--muted); font-weight:500; flex-wrap:wrap; align-items:center}
+.sun b{color:var(--chip-tx); font-weight:600}
+.wx{background:var(--chip-bg); padding:3px 9px; border-radius:20px; font-weight:600; color:var(--chip-tx)}
+.wx-pending{opacity:.6; font-style:italic}
+
+.daytoggle{width:100%; margin-top:12px; padding:11px; background:var(--card); border:1px solid var(--edge);
+  border-radius:14px; font-size:12px; font-weight:600; color:var(--chip-tx); text-align:center}
+.daytoggle.on{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.daytoggle:active{opacity:.85}
+.tl.today-mode .st.done{opacity:.32}
+.tl.today-mode .st.done .card{display:none}
+
+.nm-tx{flex:1; min-width:0; font-family:var(--serif); font-size:18px; font-weight:600; line-height:1.15;
+  display:flex; align-items:center; gap:6px; word-break:break-word}
+.nm-in{flex:1; min-width:0; font-family:var(--serif); font-size:18px; font-weight:600; background:var(--card);
+  border:1px solid var(--edge); border-radius:10px; padding:4px 8px}
+.pencil{flex:none; width:32px; height:32px; border-radius:50%; background:var(--chip-bg); color:var(--chip-tx);
+  font-size:12px; display:inline-flex; align-items:center; justify-content:center}
+.pencil:active{background:var(--soft)}
+.note-tx{font-size:13px; color:var(--note); line-height:1.5; display:flex; align-items:flex-start; gap:8px}
+.note-tx i{color:var(--muted); font-style:italic}
+.note-in{width:100%}
+.costrow{display:flex; align-items:center; gap:8px; margin-top:8px; padding-top:8px; border-top:1px solid var(--edge)}
+.costrow label{font-size:10.5px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--tan)}
+.cost-in{width:64px; padding:6px 8px; background:var(--paper); border:1px solid var(--edge); border-radius:8px; font-size:13px}
+.costrow span{font-size:12px; color:var(--muted)}
 .sun b{color:var(--chip-tx); font-weight:600}
 
 .tl{display:flex; flex-direction:column; margin-top:18px}
+.hrow{display:flex; align-items:center; gap:12px; padding:12px 13px; background:var(--card);
+  border:1px dashed var(--tan); border-radius:16px; margin-bottom:10px}
+.hicon{flex:none; width:34px; height:34px; border-radius:50%; background:var(--ink); color:var(--paper);
+  display:flex; align-items:center; justify-content:center; font-size:16px}
+.htx{flex:1; min-width:0; display:flex; flex-direction:column}
+.htx b{font-size:12.5px; font-weight:600}
+.htx span{font-size:11.5px; color:var(--muted); margin-top:2px}
+.hnav{flex:none; font-size:11px; font-weight:600; color:#fff; background:var(--accent); padding:7px 11px;
+  border-radius:16px; text-decoration:none}
+.hnav:active{background:var(--accent-dk)}
 .st{display:flex; gap:14px; padding:6px 0}
 .st .gut{display:flex; flex-direction:column; align-items:center}
 .st .num{width:30px; height:30px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center;
@@ -156,9 +198,9 @@ a{color:var(--accent); text-decoration:none}
 .st .card img{width:100%; height:140px; object-fit:cover; display:block; background:var(--chip-bg)}
 .st .card .in{padding:11px 13px}
 .st .card textarea{font-size:13px; color:var(--note); line-height:1.5; resize:none; overflow:hidden}
-.acts{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap}
-.acts button{font-size:11px; font-weight:600; color:var(--chip-tx); background:var(--chip-bg); padding:6px 11px; border-radius:20px}
-.acts .go-nav{font-size:11px; font-weight:600; color:#fff; background:var(--accent); padding:6px 11px; border-radius:20px; text-decoration:none}
+.acts{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+.acts button{font-size:12px; font-weight:600; color:var(--chip-tx); background:var(--chip-bg); padding:10px 14px; border-radius:20px; min-height:40px}
+.acts .go-nav{font-size:12px; font-weight:600; color:#fff; background:var(--accent); padding:10px 14px; border-radius:20px; text-decoration:none; min-height:40px; display:inline-flex; align-items:center}
 .acts .go-nav:active{background:var(--accent-dk)}
 .acts button:active{background:var(--soft)}
 .acts button.warn{color:var(--accent-dk)}
@@ -188,13 +230,13 @@ a{color:var(--accent); text-decoration:none}
 .srch{padding:12px 14px; background:var(--card); border:1px solid var(--edge); border-radius:16px; font-size:16px}
 .fl{display:flex; gap:6px; margin-top:10px; overflow-x:auto; padding-bottom:2px}
 .fl::-webkit-scrollbar{display:none}
-.f{flex:none; padding:7px 12px; border:1px solid var(--edge); background:var(--card); border-radius:20px;
+.f{flex:none; padding:9px 14px; border:1px solid var(--edge); background:var(--card); border-radius:20px; min-height:36px; display:inline-flex; align-items:center;
   font-size:11.5px; font-weight:600; color:var(--chip-tx)}
 .f.on{background:var(--ink); color:var(--paper); border-color:var(--ink)}
 .lst{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:4px 14px calc(16px + env(safe-area-inset-bottom))}
 .it{display:flex; gap:8px; width:100%; padding:12px 8px; border-bottom:1px solid var(--edge); align-items:flex-start}
 .it .itmain{display:flex; gap:12px; flex:1; min-width:0; text-align:left; background:none; border:none}
-.itnav{flex:none; align-self:center; width:30px; height:30px; border-radius:50%; background:var(--chip-bg);
+.itnav{flex:none; align-self:center; width:38px; height:38px; border-radius:50%; background:var(--chip-bg);
   color:var(--chip-tx); display:flex; align-items:center; justify-content:center; font-size:14px; text-decoration:none}
 .itnav:active{background:var(--soft)}
 .it:active{background:var(--card)}
@@ -261,6 +303,10 @@ a{color:var(--accent); text-decoration:none}
         <button class="circ" id="btnBack" aria-label="Retour">‹</button>
         <button class="pill" id="btnBig">Agrandir le plan</button>
       </div>
+      <div class="mlegend">
+        <span><i class="lin lin-main"></i> Itinéraire principal</span>
+        <span><i class="lin lin-side"></i> Magasins &amp; spots photo à proximité</span>
+      </div>
     </div>
     <div class="sheet">
       <div class="grab"></div>
@@ -268,6 +314,7 @@ a{color:var(--accent); text-decoration:none}
       <h2><input id="dTitle" placeholder="Titre du jour"></h2>
       <textarea class="dnote" id="dNote" rows="1" placeholder="Note du jour : réservations, logistique…"></textarea>
       <div class="sun" id="sun"></div>
+      <button class="daytoggle" id="btnToday">📍 Mode Jour J — n'afficher que ce qu'il reste</button>
       <div class="tl" id="tl"></div>
       <div class="addrow">
         <button class="prim" id="btnLib">＋ Ajouter un spot</button>
@@ -285,7 +332,8 @@ a{color:var(--accent); text-decoration:none}
 const CATS = {
   photo:{label:'Spot photo', icon:'📷', color:'#3B6E8C'}, shop:{label:'Streetwear / friperie', icon:'🛍️', color:'#8A5A9E'},
   culture:{label:'Musée / culture', icon:'🏛️', color:'#3E7A54'}, icon:{label:'Incontournable', icon:'🗽', color:'#FF5A36'},
-  food:{label:'Food', icon:'🍽️', color:'#C6913A'}, park:{label:'Parc', icon:'🌳', color:'#3E7A54'}, custom:{label:'Perso', icon:'📍', color:'#57503F'}
+  food:{label:'Food', icon:'🍽️', color:'#C6913A'}, park:{label:'Parc', icon:'🌳', color:'#3E7A54'}, custom:{label:'Perso', icon:'📍', color:'#57503F'},
+  hotel:{label:'Hôtel', icon:'🏨', color:'#14110C'}
 };
 const LIB = [
 ['Dumbo — Washington St','photo',40.7033,-73.9894,'Brooklyn',"Le plan du Manhattan Bridge encadré par les briques. Avant 8h, sinon foule et soleil de face. Clocktower Building et Eagle Warehouse autour."],
@@ -429,17 +477,36 @@ const DAYS = [
   ['2026-08-10','LUN','Lundi',10,'06:02','19:59'], ['2026-08-11','MAR','Mardi',11,'06:03','19:58']
 ];
 const KEY = 'nyc-aout-2026-v2', IMG_KEY = 'nyc-img-v1';
+const HOTEL = {name:'The Renwick Hotel', lat:40.7505, lng:-73.9788, address:'118 E 40th St, Murray Hill'};
+
+/* Distance à vol d'oiseau (km) — sert uniquement à choisir un mode de trajet suggéré */
+function haversine(lat1,lng1,lat2,lng2){
+  const R = 6371, toRad = x => x*Math.PI/180;
+  const dLat = toRad(lat2-lat1), dLng = toRad(lng2-lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R * 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+/* Suggestion de trajet — estimation à vol d'oiseau, pas un vrai calcul d'itinéraire RATP/MTA */
+function tripSuggestion(lat1,lng1,lat2,lng2){
+  const km = haversine(lat1,lng1,lat2,lng2);
+  if(km < 0.15) return {mode:'à pied', icon:'🚶', mins:Math.max(2, Math.round(km*13))};
+  if(km < 1.3)  return {mode:'à pied', icon:'🚶', mins:Math.round(km*13)};
+  if(km < 9)    return {mode:'métro', icon:'🚇', mins:Math.round(km*3 + 9)};
+  return {mode:'Uber / taxi', icon:'🚕', mins:Math.round(km*2.2 + 6)};
+}
 const uid = () => Math.random().toString(36).slice(2,9);
 
 function P(name, time, note){
   const l = LIB.find(x => x[0] === name);
-  if(!l) return {id:uid(), name, cat:'custom', lat:null, lng:null, area:'', note:note||'', time:time||'', done:false};
-  return {id:uid(), name:l[0], cat:l[1], lat:l[2], lng:l[3], area:l[4], note:(note!==undefined?note:l[5]), time:time||'', done:false};
+  if(!l) return {id:uid(), name, cat:'custom', lat:null, lng:null, area:'', note:note||'', time:time||'', done:false, cost:null};
+  return {id:uid(), name:l[0], cat:l[1], lat:l[2], lng:l[3], area:l[4], note:(note!==undefined?note:l[5]), time:time||'', done:false, cost:null};
 }
 function C(name, cat, lat, lng, time, note){
-  return {id:uid(), name, cat, lat, lng, area:'', note:note||'', time:time||'', done:false};
+  return {id:uid(), name, cat, lat, lng, area:'', note:note||'', time:time||'', done:false, cost:null};
 }
 function E(stop){ stop.essential = true; return stop; }
+function dayCost(d){ return d.stops.reduce((a,s) => a + (Number(s.cost)||0), 0); }
+function tripCost(){ return S.days.reduce((a,d) => a + dayCost(d), 0); }
 function defaultDays(){ return [
   {date:DAYS[0][0], title:'Premier soir · Midtown', note:"Boucle à pied ~1h30 depuis Grand Central. L'ONU selon l'heure d'arrivée.", stops:[
     E(P('Grand Central Terminal','17:00')), P('Chrysler Building',''), P('Daily News Building',''),
@@ -508,6 +575,32 @@ function defaultDays(){ return [
 ];}
 
 let S = { days: defaultDays(), view:'list', day:0, sel:0, big:false };
+let WX = {}; // météo par jour, indexée 0-7 ; undefined = pas encore dispo (hors fenêtre de prévision)
+const WCODE = {
+  0:['☀️','ciel dégagé'],1:['🌤️','peu nuageux'],2:['⛅','partiellement nuageux'],3:['☁️','couvert'],
+  45:['🌫️','brouillard'],48:['🌫️','brouillard givrant'],
+  51:['🌦️','bruine légère'],53:['🌦️','bruine'],55:['🌧️','bruine forte'],
+  61:['🌦️','pluie légère'],63:['🌧️','pluie'],65:['🌧️','pluie forte'],
+  71:['🌨️','neige légère'],73:['🌨️','neige'],75:['❄️','neige forte'],
+  80:['🌦️','averses légères'],81:['🌧️','averses'],82:['⛈️','averses fortes'],
+  95:['⛈️','orage'],96:['⛈️','orage + grêle'],99:['⛈️','orage violent']
+};
+async function loadWeather(){
+  try{
+    const start = DAYS[0][0], end = DAYS[7][0];
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HOTEL.lat}&longitude=${HOTEL.lng}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=America%2FNew_York&start_date=${start}&end_date=${end}&temperature_unit=fahrenheit`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if(!d.daily || !d.daily.time) return;
+    DAYS.forEach((day, i) => {
+      const idx = d.daily.time.indexOf(day[0]);
+      if(idx === -1){ WX[i] = null; return; }
+      const wc = d.daily.weathercode[idx];
+      const [icon] = WCODE[wc] || ['🌡️',''];
+      WX[i] = {icon, tmax:Math.round(d.daily.temperature_2m_max[idx]), tmin:Math.round(d.daily.temperature_2m_min[idx])};
+    });
+  }catch(e){ /* pas de réseau ou API indisponible : on affiche juste "pas encore dispo" */ }
+}
 
 /* ═══════ 3. Stockage ═══════ */
 const store = {
@@ -632,34 +725,70 @@ function drawList(){
 }
 
 /* ═══════ 7. Vue détail ═══════ */
+let editTarget = null; // {i, field:'name'|'note'}
+let todayMode = false;
+
+function weatherChip(i){
+  const w = WX[i];
+  if(w === undefined) return `<span class="wx wx-pending">Prévisions dispo à J-16</span>`;
+  if(!w) return '';
+  return `<span class="wx">${w.icon} ${w.tmin}°–${w.tmax}°</span>`;
+}
+
 function drawDetail(){
   const i = S.day, d = cur();
   $('#dEyebrow').textContent = `${DAYS[i][2]} ${DAYS[i][3]} août · Jour ${i+1}`;
   $('#dTitle').value = d.title;
   $('#dNote').value = d.note; autosize($('#dNote'));
   const set = DAYS[i][5];
+  const cost = dayCost(d);
   $('#sun').innerHTML = `<span>Lever <b>${DAYS[i][4]}</b></span><span>Coucher <b>${set}</b></span>
-    <span>Golden hour <b>≈${parseInt(set)-1}:${set.slice(3)} → ${set}</b></span>`;
+    <span>Golden hour <b>≈${parseInt(set)-1}:${set.slice(3)} → ${set}</b></span>
+    ${weatherChip(i)}
+    <span class="wx" id="costChip" style="${cost>0?'':'display:none'}">💰 ~${cost}$</span>`;
+  $('#btnToday').classList.toggle('on', todayMode);
+  $('#tl').classList.toggle('today-mode', todayMode);
 
   const tl = $('#tl');
+  const firstStop = d.stops.find(s => s.lat != null);
+  const lastStop = [...d.stops].reverse().find(s => s.lat != null);
+  const hotelRow = (label, stop, dir) => {
+    if(!stop) return '';
+    const from = dir === 'go' ? HOTEL : stop, to = dir === 'go' ? stop : HOTEL;
+    const t = tripSuggestion(from.lat, from.lng, to.lat, to.lng);
+    return `<div class="hrow">
+      <span class="hicon">${dir==='go'?'🏨':t.icon}</span>
+      <span class="htx"><b>${label}</b><span>${t.icon} ${t.mode} · environ ${t.mins} min (estimation à vol d'oiseau)</span></span>
+      <a class="hnav" href="${mapsUrl(to===HOTEL?HOTEL.name:to.name, to.lat, to.lng)}" target="_blank" rel="noopener">Itinéraire ↗</a>
+    </div>`;
+  };
   if(!d.stops.length){
     tl.innerHTML = `<div class="blank">Aucun lieu pour ce jour.<br>Pioche dans la bibliothèque (${LIB.length} adresses géolocalisées) ou crée la tienne.</div>`;
     return;
   }
-  tl.innerHTML = d.stops.map((s,j) => {
+  tl.innerHTML = hotelRow(`Départ — ${HOTEL.name}`, firstStop, 'go') + d.stops.map((s,j) => {
     const active = j === S.sel;
     const c = pcol(j);
+    const edName = editTarget && editTarget.i === j && editTarget.field === 'name';
+    const edNote = editTarget && editTarget.i === j && editTarget.field === 'note';
     return `<div class="st ${s.done?'done':''}" data-i="${j}">
       <span class="gut"><span class="num" style="background:${c}">${j+1}</span><span class="bar"></span></span>
       <span class="bd">
         <span class="r1">
-          <input class="nm" data-f="name" data-i="${j}" value="${esc(s.name)}">
+          ${edName
+            ? `<input class="nm-in" data-f="name" data-i="${j}" value="${esc(s.name)}">`
+            : `<span class="nm-tx" data-i="${j}">${esc(s.name)}<button data-a="editname" data-i="${j}" class="pencil">✎</button></span>`}
           <input class="tm" data-f="time" data-i="${j}" value="${esc(s.time||'')}" placeholder="--:--" maxlength="5">
         </span>
-        <span class="ct">${esc(CATS[s.cat].label)}${s.area?' · '+esc(s.area):''}${s.essential?' <span class=\"must\">★ Incontournable</span>':''}</span>
+        <span class="ct">${esc(CATS[s.cat].label)}${s.area?' · '+esc(s.area):''}${s.essential?' <span class="must">★ Incontournable</span>':''}</span>
         ${active ? `<span class="card">
           <img data-img="${esc(s.name)}" ${s.lat!=null?`data-lat="${s.lat}" data-lng="${s.lng}"`:''} alt="">
-          <span class="in"><textarea data-f="note" data-i="${j}" rows="2" placeholder="Ta note…">${esc(s.note||'')}</textarea></span>
+          <span class="in">
+            ${edNote
+              ? `<textarea class="note-in" data-f="note" data-i="${j}" rows="3" placeholder="Ta note…">${esc(s.note||'')}</textarea>`
+              : `<p class="note-tx" data-i="${j}">${s.note?esc(s.note):'<i>Aucune note</i>'}<button data-a="editnote" data-i="${j}" class="pencil">✎</button></p>`}
+            <span class="costrow"><label>Budget</label><input class="cost-in" data-f="cost" data-i="${j}" type="number" inputmode="decimal" placeholder="0" value="${s.cost!=null?s.cost:''}"><span>$</span></span>
+          </span>
         </span>
         <span class="acts">
           ${s.lat!=null?`<a href="${mapsUrl(s.name,s.lat,s.lng)}" target="_blank" rel="noopener" class="go-nav">↗ Itinéraire</a>`:''}
@@ -671,7 +800,9 @@ function drawDetail(){
       </span>
       ${!active ? `<span class="thumb" data-img="${esc(s.name)}" ${s.lat!=null?`data-lat="${s.lat}" data-lng="${s.lng}"`:''}></span>` : ''}
     </div>`;
-  }).join('');
+  }).join('') + hotelRow(`Retour — ${HOTEL.name}`, lastStop, 'back');
+  const edEl = tl.querySelector('.nm-in, .note-in');
+  if(edEl){ edEl.focus(); if(edEl.setSelectionRange) edEl.setSelectionRange(edEl.value.length, edEl.value.length); }
   tl.querySelectorAll('textarea').forEach(autosize);
   watch(tl);
 }
@@ -710,10 +841,17 @@ function pinIcon(color, sz, glyph, active, ring){
 function drawMap(fit){
   if(!map) return;
   layer.clearLayers();
-  const d = cur(), pts = [], path = [];
+  const d = cur(), pts = [[HOTEL.lat, HOTEL.lng]];
+  const primary = [[HOTEL.lat, HOTEL.lng]];   // itinéraire principal : tout sauf magasins/spots photo
+  const secondary = [];                        // magasins & spots photo "aux alentours"
+  const hm = L.marker([HOTEL.lat, HOTEL.lng], {zIndexOffset:3000,
+    icon: pinIcon('#14110C', 34, '🏨')}).addTo(layer);
+  hm.bindPopup(popHtml({name:HOTEL.name, cat:'hotel', time:''}, null), {closeButton:false, offset:[0,-30]});
   d.stops.forEach((s,j) => {
     if(s.lat == null) return;
-    path.push([s.lat, s.lng]); pts.push([s.lat, s.lng]);
+    pts.push([s.lat, s.lng]);
+    const isSide = s.cat === 'shop' || s.cat === 'photo';
+    if(isSide) secondary.push({lat:s.lat, lng:s.lng}); else primary.push([s.lat, s.lng]);
     const active = j === S.sel, sz = active ? 38 : 30;
     const c = s.cat === 'shop' ? CATS.shop.color : pcol(j);
     const glyph = s.cat === 'shop' ? CATS.shop.icon : (j+1);
@@ -729,15 +867,26 @@ function drawMap(fit){
     m.bindPopup(popHtml(s, imgCache[s.name] || null), {closeButton:false, offset:[0,-30]});
     m.on('popupopen', e => spotImg(s, u => { if(u && m.isPopupOpen()) e.popup.setContent(popHtml(s, u)); }));
   });
-  if(path.length > 1)
-    L.polyline(path, {color:'#FCF9F1', weight:2, opacity:.7, dashArray:'2 7', lineCap:'round'}).addTo(layer);
+  // itinéraire principal : trait continu clair
+  if(primary.length > 1)
+    L.polyline(primary, {color:'#FCF9F1', weight:2.5, opacity:.85, dashArray:'2 7', lineCap:'round'}).addTo(layer);
+  // magasins/spots photo : reliés au point le plus proche de l'itinéraire principal, trait violet
+  const mainPts = primary.length > 1 ? primary : pts;
+  secondary.forEach(s => {
+    let best = mainPts[0], bd = Infinity;
+    mainPts.forEach(p => { const dist = haversine(s.lat, s.lng, p[0], p[1]); if(dist < bd){ bd = dist; best = p; } });
+    L.polyline([[s.lat, s.lng], best], {color:'#8A5A9E', weight:1.5, opacity:.55, dashArray:'1 6', lineCap:'round'}).addTo(layer);
+  });
   if(fit && pts.length) map.fitBounds(pts, {padding:[54,54], maxZoom:15});
 }
 let allFilter = 'all';
 function drawMapAll(fit){
   if(!mapAll) return;
   layerAll.clearLayers();
-  const pts = [];
+  const pts = [[HOTEL.lat, HOTEL.lng]];
+  const hm = L.marker([HOTEL.lat, HOTEL.lng], {zIndexOffset:3000,
+    icon: pinIcon('#14110C', 30, '🏨')}).addTo(layerAll);
+  hm.bindPopup(popHtml({name:HOTEL.name, cat:'hotel', time:''}, null), {closeButton:false, offset:[0,-26]});
   LIB.forEach(l => {
     const [name, cat, lat, lng, area, note] = l;
     if(allFilter !== 'all' && cat !== allFilter) return;
@@ -823,7 +972,7 @@ function drawLst(){
   $('#lst').onclick = e => {
     const b = e.target.closest('[data-k]'); if(!b) return;
     const l = LIB[+b.dataset.k];
-    cur().stops.push({id:uid(), name:l[0], cat:l[1], lat:l[2], lng:l[3], area:l[4], note:l[5], time:'', done:false});
+    cur().stops.push({id:uid(), name:l[0], cat:l[1], lat:l[2], lng:l[3], area:l[4], note:l[5], time:'', done:false, cost:null});
     b.closest('.it').classList.add('used');
     refresh();
     toast(`Ajouté au jour ${S.day+1}`);
@@ -858,7 +1007,7 @@ function openNew(){
     if(!name){ $('#cName').focus(); toast('Il manque le nom'); return; }
     const m = $('#cGps').value.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
     cur().stops.push({id:uid(), name, cat, lat:m?+m[1]:null, lng:m?+m[2]:null, area:'',
-      note:$('#cNote').value.trim(), time:'', done:false});
+      note:$('#cNote').value.trim(), time:'', done:false, cost:null});
     refresh(); closeD(); toast('Lieu créé');
   };
 }
@@ -905,9 +1054,23 @@ $('#dNote').oninput = e => { cur().note = e.target.value; autosize(e.target); sa
 $('#tl').addEventListener('input', e => {
   const f = e.target.dataset.f; if(!f) return;
   const s = cur().stops[+e.target.dataset.i];
-  s[f] = e.target.value;
+  if(f === 'cost'){
+    s.cost = e.target.value === '' ? null : Number(e.target.value);
+    const chip = $('#costChip'), tot = dayCost(cur());
+    if(chip){ chip.textContent = `💰 ~${tot}$`; chip.style.display = tot>0 ? '' : 'none'; }
+  } else {
+    s[f] = e.target.value;
+  }
   if(f === 'note') autosize(e.target);
   save();
+});
+$('#tl').addEventListener('focusout', e => {
+  if(e.target.classList.contains('nm-in') || e.target.classList.contains('note-in')){
+    editTarget = null; drawDetail();
+  }
+});
+$('#tl').addEventListener('keydown', e => {
+  if(e.target.classList.contains('nm-in') && e.key === 'Enter') e.target.blur();
 });
 $('#tl').addEventListener('click', e => {
   const a = e.target.closest('[data-a]');
@@ -917,17 +1080,21 @@ $('#tl').addEventListener('click', e => {
     if(a.dataset.a === 'done') st[i].done = !st[i].done;
     if(a.dataset.a === 'up' && i > 0){ st.splice(i-1, 0, st.splice(i,1)[0]); S.sel = i-1; }
     if(a.dataset.a === 'down' && i < st.length-1){ st.splice(i+1, 0, st.splice(i,1)[0]); S.sel = i+1; }
+    if(a.dataset.a === 'editname'){ editTarget = {i, field:'name'}; drawDetail(); return; }
+    if(a.dataset.a === 'editnote'){ editTarget = {i, field:'note'}; drawDetail(); return; }
     refresh(); return;
   }
   if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   const row = e.target.closest('.st'); if(!row) return;
   S.sel = +row.dataset.i;
+  editTarget = null;
   drawDetail(); drawMap(false);
 });
 
 $('#btnLib').onclick = openLib;
 $('#btnNew').onclick = openNew;
 $('#btnExport').onclick = exportTxt;
+$('#btnToday').onclick = () => { todayMode = !todayMode; drawDetail(); };
 $('#scrim').addEventListener('click', e => {
   if(e.target === $('#scrim') || e.target.closest('[data-close]')) closeD();
 });
@@ -944,6 +1111,7 @@ if('serviceWorker' in navigator && location.protocol === 'https:'){
   await load();
   initMap();
   drawList();
+  loadWeather().then(() => { if(S.view === 'detail') drawDetail(); });
 })();
 </script>
 </body>
