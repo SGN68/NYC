@@ -2,8 +2,8 @@
    Objectif : l'app démarre sans réseau, et les tuiles de carte déjà vues
    restent disponibles hors ligne (utile en roaming aux États-Unis). */
 
-const SHELL = 'nyc-shell-v3';   // fichiers de l'app
-const RUN   = 'nyc-run-v3';     // Leaflet + tuiles, mis en cache à l'usage
+const SHELL = 'nyc-shell-v4';   // fichiers de l'app
+const RUN   = 'nyc-run-v4';     // Leaflet + tuiles, mis en cache à l'usage
 
 const FILES = [
   './',
@@ -37,7 +37,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  const isTile = /server\.arcgisonline\.com|upload\.wikimedia\.org|en\.wikipedia\.org/.test(url.hostname);
+  const isTile = /basemaps\.cartocdn\.com|upload\.wikimedia\.org|en\.wikipedia\.org/.test(url.hostname);
   const isCdn  = url.hostname === 'cdnjs.cloudflare.com';
 
   // Tuiles et CDN : on sert le cache d'abord, on complète depuis le réseau.

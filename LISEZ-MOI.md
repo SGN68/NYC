@@ -57,19 +57,23 @@ la nouvelle version arrive à la prochaine ouverture avec du réseau. Si ça coi
 
 ---
 
-## Mise à jour v3 — design Claude Design + plan satellite
+## Mise à jour v4 — nouveau fond de carte, magasins, carte d'ensemble, itinéraires
 
-Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html`, `sw.js`,
-`manifest.webmanifest` et les 3 icônes (elles ont changé de couleur) → *Commit changes*.
-L'app se met à jour à la prochaine ouverture avec du réseau.
+Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html`, `sw.js`
+(les icônes et le manifeste n'ont pas changé cette fois) → *Commit changes*.
 
 Ce qui change :
-- Le design de Claude Design est appliqué à l'app entière : fond crème, Spectral + Work Sans,
-  accent orange #FF5A36, vue Liste (cartes des 8 jours) → vue Détail (plan + feuille).
-- Les polices sont embarquées dans `index.html` : rien à télécharger, ça marche hors ligne.
-- Le plan est en **imagerie satellite** (Esri World Imagery) avec les noms de rues par-dessus.
-  Bouton « Agrandir le plan » pour le passer en grand.
-- Les épingles reprennent la forme goutte du design et la palette des 6 couleurs.
+- Fond de carte remplacé (CARTO Voyager, plus lisible) — l'ancien satellite est retiré.
+- 14 nouveaux magasins ajoutés à la bibliothèque (130 lieux au total), casés dans les
+  jours 4 (grosse matinée shopping SoHo/LES/NoHo) et 5 (Bushwick).
+- Chaque catégorie a son icône sur la carte (🛍️ pour les magasins, etc.).
+- Nouvelle carte « Voir la carte » sur l'écran d'accueil (même format que les jours) :
+  affiche tous les lieux de la bibliothèque avec des filtres par catégorie, sans notion
+  de jour précis.
+- Bouton « Itinéraire ↗ » sur chaque lieu (étapes de jour, bibliothèque, bulles de carte)
+  qui ouvre directement Apple Plans avec le lieu pré-rempli.
+- Balayage latéral de l'écran bloqué (le geste ne fait plus glisser toute l'app sur le côté).
+- Badges « ★ Incontournable » sur les lieux à ne pas rater.
 
-⚠️ Le service worker cache maintenant les tuiles satellite (plus lourdes que les anciennes).
-Avant de partir, en wifi, balade-toi sur les quartiers que tu vas faire à plusieurs zooms.
+⚠️ Le service worker recharge le nouveau fond de carte : ouvre l'app en wifi une première
+fois après la mise à jour pour que les nouvelles tuiles soient mises en cache avant le vol.
