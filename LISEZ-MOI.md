@@ -57,17 +57,19 @@ la nouvelle version arrive à la prochaine ouverture avec du réseau. Si ça coi
 
 ---
 
-## Mise à jour de juillet (v2)
+## Mise à jour v3 — design Claude Design + plan satellite
 
-Pour mettre à jour l'app déjà en ligne : dans ton dépôt GitHub, **Add file → Upload files**,
-glisse les nouveaux `index.html` et `sw.js` (ils remplacent les anciens) → *Commit changes*.
-À la prochaine ouverture de l'app avec du réseau, la nouvelle version se charge.
+Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html`, `sw.js`,
+`manifest.webmanifest` et les 3 icônes (elles ont changé de couleur) → *Commit changes*.
+L'app se met à jour à la prochaine ouverture avec du réseau.
 
-Nouveautés :
-- Ton itinéraire du brief est pré-rempli (jours 1, 2, 3, 5 confirmés ; Greenwich/Queens/Harlem posés sur les jours restants, à déplacer).
-- Menus repensés pour le téléphone : ils s'ouvrent maintenant depuis le bas, bouton Fermer à portée de pouce.
-- Photos automatiques des lieux (chargées depuis Wikipédia quand tu as du réseau, puis gardées hors ligne).
-- Deux thèmes : Nuit (métro) et Papier (affiche de service) — bouton en haut.
+Ce qui change :
+- Le design de Claude Design est appliqué à l'app entière : fond crème, Spectral + Work Sans,
+  accent orange #FF5A36, vue Liste (cartes des 8 jours) → vue Détail (plan + feuille).
+- Les polices sont embarquées dans `index.html` : rien à télécharger, ça marche hors ligne.
+- Le plan est en **imagerie satellite** (Esri World Imagery) avec les noms de rues par-dessus.
+  Bouton « Agrandir le plan » pour le passer en grand.
+- Les épingles reprennent la forme goutte du design et la palette des 6 couleurs.
 
-⚠️ La v2 repart sur l'itinéraire pré-rempli : si tu avais déjà saisi des choses dans la v1
-sur ton téléphone, elles ne sont pas reprises (exporte-les avant de mettre à jour si besoin).
+⚠️ Le service worker cache maintenant les tuiles satellite (plus lourdes que les anciennes).
+Avant de partir, en wifi, balade-toi sur les quartiers que tu vas faire à plusieurs zooms.
