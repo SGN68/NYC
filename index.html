@@ -89,7 +89,7 @@ a{color:var(--accent); text-decoration:none}
 /* ══ VUE DÉTAIL ══ */
 #vDetail{overflow-y:auto; -webkit-overflow-scrolling:touch; background:var(--paper)}
 .mapbox{position:relative; height:340px; flex:none; background:#2B3A2E; overflow:hidden; transition:height .28s ease}
-.mapbox.big{height:calc(72dvh)}
+.mapbox.big{position:fixed; inset:0; height:100dvh; z-index:700; border-radius:0}
 #map{position:absolute; inset:0}
 .leaflet-container{background:#2B3A2E; font-family:var(--sans)}
 .mtop{position:absolute; top:calc(14px + env(safe-area-inset-top)); left:0; right:0; z-index:500;
@@ -99,14 +99,16 @@ a{color:var(--accent); text-decoration:none}
   box-shadow:0 4px 12px -4px rgba(0,0,0,.3); pointer-events:none}
 .mlegend span{display:flex; align-items:center; gap:6px; font-size:10px; font-weight:600; color:var(--ink)}
 .mlegend .lin{width:16px; height:2px; border-radius:2px}
-.mlegend .lin-main{background:repeating-linear-gradient(90deg,#B8B098 0 4px, transparent 4px 7px)}
-.mlegend .lin-side{background:repeating-linear-gradient(90deg,#8A5A9E 0 3px, transparent 3px 5px)}
+.mlegend .lin-main{background:#D9401F}
+.mlegend .lin-side{background:repeating-linear-gradient(90deg,#9C9186 0 3px, transparent 3px 5px)}
 .mtop > *{pointer-events:auto}
 .circ{width:40px; height:40px; border-radius:50%; background:rgba(252,249,241,.92); backdrop-filter:blur(6px);
   display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px -4px rgba(0,0,0,.35);
   color:var(--ink); font-size:20px; flex:none}
+.mtopRight{display:flex; gap:8px; align-items:center}
 .pill{background:rgba(252,249,241,.92); backdrop-filter:blur(6px); padding:7px 14px; border-radius:20px;
   font-size:12px; font-weight:600; color:var(--ink); box-shadow:0 4px 12px -4px rgba(0,0,0,.35)}
+.pill.on{background:#0039A6; color:#fff}
 .pill:active{background:#fff}
 .pin{cursor:pointer}
 .pin i{display:block; border-radius:50% 50% 50% 2px; transform:rotate(45deg);
@@ -289,7 +291,10 @@ a{color:var(--accent); text-decoration:none}
       <div id="mapAll"></div>
       <div class="mtop">
         <button class="circ" id="btnBackAll" aria-label="Retour">‹</button>
-        <span class="pill" id="allCount"></span>
+        <span class="mtopRight">
+          <button class="pill" id="btnMetroAll">🚇 Métro</button>
+          <span class="pill" id="allCount"></span>
+        </span>
       </div>
       <div class="legend" id="legend"></div>
     </div>
@@ -301,7 +306,10 @@ a{color:var(--accent); text-decoration:none}
       <div id="map"></div>
       <div class="mtop">
         <button class="circ" id="btnBack" aria-label="Retour">‹</button>
-        <button class="pill" id="btnBig">Agrandir le plan</button>
+        <span class="mtopRight">
+          <button class="pill" id="btnMetro">🚇 Métro</button>
+          <button class="pill" id="btnBig">Agrandir le plan</button>
+        </span>
       </div>
       <div class="mlegend">
         <span><i class="lin lin-main"></i> Itinéraire principal</span>
@@ -336,6 +344,17 @@ const CATS = {
   hotel:{label:'Hôtel', icon:'🏨', color:'#14110C'}
 };
 const LIB = [
+['Lego Store (Rockefeller Center)','shop',40.7588,-73.9787,'Manhattan',"620 5th Ave. Sur le chemin entre Rockefeller Center et la 5e Avenue."],
+['Century 21 NYC','shop',40.7103,-74.0111,'Manhattan',"22 Cortlandt St. Grand magasin dégriffé, juste en face de l'Oculus et du World Trade Center."],
+['C.O. Bigelow Apothecaries','shop',40.7343,-73.9989,'Manhattan',"414 6th Ave, Greenwich Village. La plus vieille pharmacie-apothicaire des États-Unis (1838), enseigne néon d'origine."],
+["Beacon's Closet (Greenwich Village)",'shop',40.7356,-73.9951,'Manhattan',"10 W 13th St. Juste au sud-ouest d'Union Square, la seule adresse Beacon's Closet à Manhattan (les autres sont à Brooklyn)."],
+['The Shed','culture',40.7533,-74.0029,'Manhattan',"545 W 30th St, Hudson Yards. Centre culturel ouvert en 2019, expositions et spectacles qui changent régulièrement."],
+['Kitchen Arts & Letters','shop',40.7853,-73.9535,'Manhattan',"1435 Lexington Ave. Librairie culinaire spécialisée, réputée dans le monde entier."],
+["Bloomingdale's",'shop',40.7597,-73.9700,'Manhattan',"1000 3rd Ave. Le grand magasin historique, entrée emblématique sur Lexington/59th."],
+['Ralph Lauren — 867 Madison','shop',40.7697,-73.9648,'Manhattan',"L'hôtel particulier transformé en boutique-flagship, un des plus beaux intérieurs commerciaux de la ville."],
+['Central Park Reservoir','park',40.7855,-73.9613,'Manhattan',"Le grand bassin (Jacqueline Kennedy Onassis Reservoir), piste de jogging autour, vue dégagée sur les tours de la 5e Avenue et du Central Park West."],
+['McCarren Park','park',40.7202,-73.9515,'Brooklyn',"Entre Williamsburg et Greenpoint. Piscine historique, terrain de sport, marché le week-end."],
+['Vinegar Hill Historic District','photo',40.7025,-73.9808,'Brooklyn',"Petites rues pavées entre Dumbo et le Brooklyn Navy Yard, très peu fréquentées."],
 ['Dumbo — Washington St','photo',40.7033,-73.9894,'Brooklyn',"Le plan du Manhattan Bridge encadré par les briques. Avant 8h, sinon foule et soleil de face. Clocktower Building et Eagle Warehouse autour."],
 ['Pebble Beach (Main St)','photo',40.7038,-73.9925,'Brooklyn',"Au ras de l'eau : pont de Brooklyn + skyline dans le même cadre."],
 ['Brooklyn Bridge Park — Pier 1','photo',40.7003,-73.9967,'Brooklyn',"Skyline de Lower Manhattan. Meilleur au coucher du soleil."],
@@ -479,6 +498,71 @@ const DAYS = [
 const KEY = 'nyc-aout-2026-v2', IMG_KEY = 'nyc-img-v1';
 const HOTEL = {name:'The Renwick Hotel', lat:40.7505, lng:-73.9788, address:'118 E 40th St, Murray Hill'};
 
+/* ═══════ Métro — données schématiques (stations réelles, tracé simplifié en ligne droite entre stations
+   consécutives, pas les courbes exactes des voies). Limité aux lignes utiles au séjour. ═══════ */
+const SUBWAY_ST = {
+  // 1 / 2 / 3 — rouge (Broadway–7th Ave / Lenox)
+  '242nd St':[40.8893,-73.9007],'238th St':[40.8845,-73.9006],'Van Cortlandt Park':[40.8893,-73.9007],
+  '96th St-1':[40.7940,-73.9721],'86th St-1':[40.7878,-73.9764],'79th St-1':[40.7837,-73.9800],
+  '72nd St-1':[40.7784,-73.9819],'66th St-Lincoln Ctr':[40.7735,-73.9822],'59th St-Columbus Circle':[40.7681,-73.9819],
+  '50th St-1':[40.7616,-73.9835],'Times Sq-42nd St':[40.7556,-73.9868],'34th St-Penn Station-1':[40.7522,-73.9930],
+  '14th St-1':[40.7379,-74.0006],'Christopher St-Sheridan Sq':[40.7331,-74.0027],'Houston St-1':[40.7280,-74.0057],
+  'Canal St-1':[40.7223,-74.0059],'Chambers St-1':[40.7151,-74.0092],'Wall St-2-3':[40.7076,-74.0113],
+  'South Ferry':[40.7024,-74.0132],'96th St-2-3':[40.7947,-73.9633],'125th St-2-3':[40.8075,-73.9452],
+  // 4 / 5 / 6 — vert (Lexington Ave)
+  '125th St-4-5-6':[40.8043,-73.9378],'86th St-4-6':[40.7784,-73.9558],'68th St-Hunter College':[40.7679,-73.9639],
+  '59th St-4-6':[40.7623,-73.9679],'51st St-6':[40.7570,-73.9720],'Grand Central-42nd St':[40.7527,-73.9772],
+  '33rd St-6':[40.7455,-73.9822],'23rd St-6':[40.7394,-73.9862],'14th St-Union Sq':[40.7359,-73.9906],
+  'Bleecker St':[40.7256,-73.9944],'Spring St-6':[40.7223,-73.9976],'Canal St-6':[40.7186,-74.0007],
+  'Brooklyn Bridge-City Hall':[40.7133,-74.0044],'Bowling Green':[40.7043,-74.0140],
+  // A / C / E — bleu (8th Ave)
+  '175th St':[40.8474,-73.9397],'168th St-A':[40.8404,-73.9397],'145th St-A':[40.8241,-73.9436],
+  '125th St-A':[40.8115,-73.9526],'59th St-Columbus Circle-A':[40.7681,-73.9819],
+  '42nd St-Port Authority':[40.7570,-73.9899],'34th St-Penn Station-A':[40.7524,-73.9936],
+  '14th St-8th Ave':[40.7402,-74.0021],'W 4th St':[40.7320,-74.0004],'Spring St-C-E':[40.7255,-74.0035],
+  'Canal St-A':[40.7197,-74.0059],'Chambers St-A':[40.7145,-74.0086],'Fulton St':[40.7102,-74.0079],
+  'World Trade Center-E':[40.7128,-74.0113],'Jay St-MetroTech':[40.6923,-73.9862],'High St':[40.7000,-73.9903],
+  // B / D / F / M — orange (6th Ave)
+  '145th St-B-D':[40.8246,-73.9446],'59th St-Columbus Circle-B':[40.7681,-73.9819],'47-50 Sts-Rockefeller Ctr':[40.7588,-73.9814],
+  '42nd St-Bryant Pk':[40.7541,-73.9840],'34th St-Herald Sq':[40.7497,-73.9877],'23rd St-F':[40.7425,-73.9925],
+  'W 4th St-B-D-F-M':[40.7320,-74.0004],'Broadway-Lafayette St':[40.7255,-73.9965],'Delancey St-Essex St':[40.7183,-73.9880],
+  'York St':[40.7013,-73.9863],'Jay St-MetroTech-F':[40.6923,-73.9862],'7th Ave-F':[40.6649,-73.9799],
+  // N / Q / R / W — jaune (Broadway)
+  'Times Sq-N-Q-R':[40.7556,-73.9868],'34th St-Herald Sq-N':[40.7497,-73.9877],'23rd St-N':[40.7412,-73.9897],
+  '14th St-Union Sq-N':[40.7359,-73.9906],'8th St-NYU':[40.7302,-73.9925],'Canal St-N':[40.7188,-74.0000],
+  'City Hall-R':[40.7133,-74.0075],'Whitehall St-South Ferry':[40.7031,-74.0126],'Court St':[40.6936,-73.9910],
+  'Atlantic Ave-Barclays Ctr':[40.6844,-73.9772],
+  // L — gris (14th St / Canarsie)
+  '8th Ave-L':[40.7397,-74.0026],'6th Ave-L':[40.7380,-73.9967],'Union Sq-L':[40.7350,-73.9905],
+  '3rd Ave-L':[40.7328,-73.9862],'1st Ave-L':[40.7307,-73.9819],'Bedford Ave-L':[40.7177,-73.9569],
+  'Lorimer St-L':[40.7141,-73.9478],'Graham Ave-L':[40.7145,-73.9443],'Grand St-L':[40.7118,-73.9403],
+  'Montrose Ave-L':[40.7075,-73.9403],'Morgan Ave-L':[40.7067,-73.9331],'Jefferson St-L':[40.7062,-73.9223],
+  'DeKalb Ave-L':[40.7038,-73.9224],
+  // 7 — violet (Flushing)
+  'Times Sq-7':[40.7556,-73.9868],'5th Ave-7':[40.7527,-73.9807],'Grand Central-7':[40.7517,-73.9767],
+  'Hunters Point Ave':[40.7423,-73.9481],'Court Sq-7':[40.7473,-73.9454],'Queensboro Plaza':[40.7509,-73.9403],
+  // G — vert clair (Crosstown)
+  'Court Sq-G':[40.7473,-73.9454],'21st St-Van Alst':[40.7462,-73.9494],'Greenpoint Ave':[40.7311,-73.9543],
+  'Nassau Ave':[40.7245,-73.9513],'Metropolitan Ave-G':[40.7137,-73.9509],'Bedford-Nostrand Aves':[40.6897,-73.9535],
+  // J / Z — marron (Nassau St)
+  'Marcy Ave':[40.7085,-73.9678],'Myrtle Ave-J':[40.6996,-73.9377],'Delancey St-J':[40.7184,-73.9884],
+  'Canal St-J':[40.7144,-73.9997],'Chambers St-J':[40.7130,-74.0055],'Broad St':[40.7043,-74.0106],
+  // Roosevelt Island / Harlem (repères ponctuels utiles)
+  '125th St-Harlem':[40.8043,-73.9378]
+};
+const SUBWAY_LINES = [
+  {name:'1', color:'#EE352E', st:['242nd St','96th St-1','86th St-1','79th St-1','72nd St-1','66th St-Lincoln Ctr','59th St-Columbus Circle','50th St-1','Times Sq-42nd St','34th St-Penn Station-1','14th St-1','Christopher St-Sheridan Sq','Houston St-1','Canal St-1','Chambers St-1','South Ferry']},
+  {name:'2/3', color:'#EE352E', st:['96th St-2-3','72nd St-1','Times Sq-42nd St','34th St-Penn Station-1','14th St-1','Chambers St-1','Wall St-2-3']},
+  {name:'4/5/6', color:'#00933C', st:['125th St-4-5-6','86th St-4-6','68th St-Hunter College','59th St-4-6','51st St-6','Grand Central-42nd St','33rd St-6','23rd St-6','14th St-Union Sq','Bleecker St','Spring St-6','Canal St-6','Brooklyn Bridge-City Hall','Bowling Green']},
+  {name:'A/C/E', color:'#0039A6', st:['175th St','168th St-A','145th St-A','125th St-A','59th St-Columbus Circle-A','42nd St-Port Authority','34th St-Penn Station-A','14th St-8th Ave','W 4th St','Spring St-C-E','Canal St-A','Chambers St-A','Fulton St','World Trade Center-E','Jay St-MetroTech','High St']},
+  {name:'B/D/F/M', color:'#FF6319', st:['145th St-B-D','59th St-Columbus Circle-B','47-50 Sts-Rockefeller Ctr','42nd St-Bryant Pk','34th St-Herald Sq','23rd St-F','W 4th St-B-D-F-M','Broadway-Lafayette St','Delancey St-Essex St','York St','Jay St-MetroTech-F','7th Ave-F']},
+  {name:'N/Q/R/W', color:'#FCCC0A', st:['Times Sq-N-Q-R','34th St-Herald Sq-N','23rd St-N','14th St-Union Sq-N','8th St-NYU','Canal St-N','City Hall-R','Whitehall St-South Ferry','Court St','Atlantic Ave-Barclays Ctr']},
+  {name:'L', color:'#A7A9AC', st:['8th Ave-L','6th Ave-L','Union Sq-L','3rd Ave-L','1st Ave-L','Bedford Ave-L','Lorimer St-L','Graham Ave-L','Grand St-L','Montrose Ave-L','Morgan Ave-L','Jefferson St-L','DeKalb Ave-L']},
+  {name:'7', color:'#B933AD', st:['Times Sq-7','5th Ave-7','Grand Central-7','Hunters Point Ave','Court Sq-7','Queensboro Plaza']},
+  {name:'G', color:'#6CBE45', st:['Court Sq-G','21st St-Van Alst','Greenpoint Ave','Nassau Ave','Metropolitan Ave-G','Bedford-Nostrand Aves']},
+  {name:'J/Z', color:'#996633', st:['Marcy Ave','Delancey St-J','Canal St-J','Chambers St-J','Broad St']}
+];
+
 /* Distance à vol d'oiseau (km) — sert uniquement à choisir un mode de trajet suggéré */
 function haversine(lat1,lng1,lat2,lng2){
   const R = 6371, toRad = x => x*Math.PI/180;
@@ -508,69 +592,93 @@ function E(stop){ stop.essential = true; return stop; }
 function dayCost(d){ return d.stops.reduce((a,s) => a + (Number(s.cost)||0), 0); }
 function tripCost(){ return S.days.reduce((a,d) => a + dayCost(d), 0); }
 function defaultDays(){ return [
-  {date:DAYS[0][0], title:'Premier soir · Midtown', note:"Boucle à pied ~1h30 depuis Grand Central. L'ONU selon l'heure d'arrivée.", stops:[
-    E(P('Grand Central Terminal','17:00')), P('Chrysler Building',''), P('Daily News Building',''),
-    P('Siège des Nations Unies','', "À confirmer selon l'heure — l'esplanade des drapeaux se voit de la 1re Av."),
-    P('Bryant Park','17:40'), P('New York Public Library',''), E(P('Times Square','18:30')),
-    P('MoMA','19:15'), P('Rockefeller Center',''), E(P('Top of the Rock','20:30')),
-    P('Summit One Vanderbilt','21:30')
+  {date:DAYS[0][0], title:'Premier soir — Midtown', note:"Boucle à pied depuis Grand Central. L'ONU selon l'heure d'arrivée du vol.", stops:[
+    P('Grand Central Terminal'), P('Chrysler Building'), P('Daily News Building'),
+    P('Siège des Nations Unies','', "À voir selon l'heure d'arrivée — l'esplanade des drapeaux se voit de la 1re Av."),
+    P('Bryant Park'), P('New York Public Library'), P('Times Square'),
+    P('MoMA'), P('Rockefeller Center'), P('Lego Store (Rockefeller Center)'),
+    E(P('Summit One Vanderbilt'))
   ]},
-  {date:DAYS[1][0], title:'Downtown & Liberté', note:"Réserver le créneau ferry 9h30 à l'avance. Sécurité type aéroport à Battery Park.", stops:[
-    P('Battery Park','09:00'), E(P('Statue de la Liberté','09:30')), P('Ellis Island','11:30'),
-    E(P('9/11 Memorial & Museum','13:30')), E(P('One World Observatory','16:00')),
-    P('Oculus (World Trade Center)',''), P('Wall Street / Charging Bull','17:30'),
-    P('Brookfield Place',''), P('Pier A','')
+  {date:DAYS[1][0], title:'Downtown', note:"Réserve le ferry pour la Statue à l'avance. Sécurité type aéroport à Battery Park.", stops:[
+    P('Battery Park'), P('Staten Island Ferry'),
+    E(P('Statue de la Liberté','09:30', "Créneau réservé.")),
+    P('Ellis Island'),
+    P('9/11 Memorial & Museum'),
+    E(P('One World Observatory','16:00', "Créneau réservé, puis l'Oculus juste en dessous.")),
+    P('Oculus (World Trade Center)'), P('Century 21 NYC'),
+    P('Wall Street / Charging Bull','', "En remontant Wall Street puis Broadway."),
+    P('Brookfield Place','', "Le mur de Berlin est au niveau de l'esplanade."),
+    P('Pier A')
   ]},
-  {date:DAYS[2][0], title:'Central Park & Uptown', note:"AMNH ouvre à 10h, compter 4h. Téléphérique inclus dans la MetroCard. Top of the Rock au sunset — réserver.", stops:[
-    P('Columbus Circle','09:15'), E(P('American Museum of Natural History','10:00')),
-    P('Central Park','14:30', "Bethesda Terrace, Bow Bridge, le Mall — entre le musée et la 5e Av."),
-    P('5e Avenue',''), P('Roosevelt Island Tramway','16:30', "Sens Manhattan → Roosevelt. Inclus dans la MetroCard."),
-    P('Four Freedoms Park',''), E(P('Top of the Rock','19:15', "Créneau sunset (coucher 20:05). Réserver."))
+  {date:DAYS[2][0], title:'Manhattan Sud', note:"Grande marche à travers les quartiers du sud de Manhattan — Chinatown → Little Italy → Tribeca → Hudson Square → SoHo → Nolita → NoHo → East Village → Lower East Side.", stops:[
+    C('Chinatown — marché','food',40.7158,-73.9970,'', "Marchés et épiceries, meilleur en matinée."),
+    P('Little Italy','', "Mulberry St."),
+    C('Tribeca','photo',40.7163,-74.0086,'', "Rues pavées, anciens entrepôts."),
+    C('Hudson Square','photo',40.7273,-74.0089,'', "Entre Tribeca et SoHo."),
+    P('Doyers Street (Chinatown)',''),
+    C('NoLIta','photo',40.7223,-73.9948,'', "Nord de Little Italy — boutiques et cafés."),
+    C('NoHo','photo',40.7280,-73.9938,'', "Nord de Houston — architecture et façades en fonte."),
+    C('East Village — balade','photo',40.7265,-73.9815,'', "St Marks Place et les rues autour."),
+    P('East Village Thrift Shop',''),
+    C('Lower East Side — balade','photo',40.7180,-73.9877,'', "Orchard St, Ludlow St."),
+    C('Spectacle — Broadway','icon',40.7590,-73.9845,'19:00', "Réservation de spectacle — heure à respecter.")
   ]},
-  {date:DAYS[3][0], title:'Shopping SoHo/LES & High Line', note:"Grosse journée : matinée shopping (SoHo → LES → NoHo), après-midi Village/High Line. Le vendredi le MoMA est gratuit 16h-20h. N'hésite pas à couper la matinée shopping si tu sens que ça traîne — tout est réordonnable.", stops:[
-    P('New Era Soho','09:00'), P('2nd Street SoHo',''),
-    P('Metropolis Vintage','10:15'), P('194 New York',''),
-    P('District One','11:15'), P('Essx',''), P('Rare Bodega',''),
-    P('Varsity New York',''), P("Luke's",''),
-    P('East Village Thrift Shop','12:30'), P("Other People's Clothes",''),
-    P("Dave's New York",''),
-    P('Washington Square Park','14:00'), P('West Village',''), P('Whitney Museum',''),
-    E(P('The High Line','16:00')), P('Chelsea Market','17:00', "Los Tacos No.1 au fond. L'Oreo est né ici."),
-    P('Vessel',''), P('Edge — Hudson Yards',''),
-    E(P('MoMA','19:00', "Vendredi gratuit 16h-20h — réserver en ligne bien avant, dernier créneau serré si la journée déborde.")),
-    E(P('Empire State Building','21:00', "De nuit."))
+  {date:DAYS[3][0], title:'Lower Manhattan — Greenwich & High Line', note:"Le MoMA ouvre à 10h30 (billets à l'avance conseillés). Beacon's Closet à Manhattan est la seule adresse de la chaîne hors Brooklyn.", stops:[
+    P('MoMA','', "Ouvre à 10h30 — compter 2h."),
+    P('Washington Square Park'),
+    C('Greenwich Village — balade','photo',40.7336,-74.0000,'', "~1h30 en flânant vers l'ouest."),
+    P("Beacon's Closet (Greenwich Village)"),
+    P('C.O. Bigelow Apothecaries'),
+    P('West Village'),
+    E(P('The High Line','', "Entre Meatpacking District et Hudson Yards, ~1h.")),
+    P('Vessel'), C('The Shed','culture',40.7533,-74.0029,'', "Programmation à vérifier avant de s'y arrêter."),
+    P('Edge — Hudson Yards'), P('Whitney Museum'),
+    P('Chelsea Market','', "Los Tacos No.1 au fond. L'Oreo est né ici."),
+    P('Union Square'), P('Madison Square Park'),
+    C('Koreatown','food',40.7480,-73.9866,'', "32nd St."),
+    P('230 Fifth Rooftop'),
+    P('Flatiron Building'),
+    E(P('Empire State Building'))
   ]},
-  {date:DAYS[4][0], title:'Brooklyn & Williamsburg', note:"La journée la plus réglée du brief. Smorgasburg le samedi 11h-18h si tu veux caler le déjeuner là-bas.", stops:[
-    P('City Hall / Civic Center','08:30', "20 min de métro. City Hall + Supreme Court avant la passerelle."),
-    E(P('Brooklyn Bridge (traversée)','08:45', "~35 min, vers Brooklyn.")),
-    P('Brooklyn Heights Promenade','09:30', "Boucle ~1h30 : Montague → Remsen → Pierrepont → promenade → Willow St → 24 Middagh → Plymouth Church."),
-    P('Squibb Park Bridge',''), P('Tobacco Warehouse',''), P("Jane's Carousel",''),
-    P('Pebble Beach (Main St)',''), E(P('Dumbo — Washington St','11:00')),
-    P('Time Out Market','12:30', "Déjeuner — ou Juliana's juste en dessous."),
-    C('Ferry → Williamsburg','icon',40.7042,-73.9936,'14:00',"~45 min sur l'eau, ligne East River. Puis Bedford Avenue, friperies, The Lost Time."),
-    P('Bedford Avenue','15:00'), P('10ft Single by Stella Dallas',''),
-    P('The Bushwick Collective','16:00'), P('Urban Jungle','17:00', "Prévoir du temps, c'est immense."), P('L Train Vintage — Knickerbocker',''),
-    E(P('Domino Park','19:30', "Coucher de soleil (20:02) + dîner.")),
-    C('Retour : pont de nuit ou métro','custom',null,null,'',"Brooklyn Bridge de nuit si l'énergie suit, sinon métro L direct.")
+  {date:DAYS[4][0], title:'Brooklyn & Williamsburg', note:"Smorgasburg le samedi 11h-18h si tu veux caler le déjeuner là-bas.", stops:[
+    P('City Hall / Civic Center','', "City Hall + Supreme Court avant la passerelle."),
+    E(P('Brooklyn Bridge (traversée)','', "~35 min, vers Brooklyn.")),
+    P('Brooklyn Heights Promenade'),
+    C('Vinegar Hill Historic District','photo',40.7025,-73.9808,'',"Petites rues pavées entre Dumbo et le Brooklyn Navy Yard."),
+    P('Brooklyn Bridge Park — Pier 1'), P('Squibb Park Bridge'), P('Tobacco Warehouse'),
+    P("Jane's Carousel"), P('Pebble Beach (Main St)'), P('Dumbo — Washington St'),
+    P('Time Out Market','', "Ou Juliana's juste en dessous."),
+    P('Domino Park'),
+    P('Smorgasburg (Williamsburg)','', "Samedi seulement, 11h-18h."),
+    P('Bedford Avenue'), P('10ft Single by Stella Dallas'),
+    C('McCarren Park','park',40.7202,-73.9515,'',"Entre Williamsburg et Greenpoint."),
+    C('Greenpoint — balade','photo',40.7304,-73.9548,'',"Manhattan Ave et les rues autour."),
+    P('The Bushwick Collective')
   ]},
-  {date:DAYS[5][0], title:'Harlem & Morningside', note:"Boucle du brief : ~25 min de métro depuis Midtown, puis tout à pied. Retour par Central Park.", stops:[
-    P('Marcus Garvey Park','10:00'), P('Astor Row','10:40'),
-    P("Sylvia's Restaurant",'12:00', "Institution soul food depuis 1962. Brunch gospel le dimanche."),
-    E(P('Harlem / Apollo Theater','13:30')), P("Striver's Row",'14:15'),
-    P('Columbia University','15:30'), P('General Grant Memorial',''),
-    E(P('Cathedral St John the Divine','16:30')), P('Morningside Park','')
+  {date:DAYS[5][0], title:'Central Park & Upper West/East Side', note:"AMNH ouvre à 10h — compter 4h. Téléphérique Roosevelt Island inclus dans la MetroCard.", stops:[
+    P('American Museum of Natural History','', "Ouvre à 10h — compter 4h."),
+    P('Central Park'), P('Columbus Circle'),
+    P('Roosevelt Island Tramway','', "Inclus dans la MetroCard."),
+    P('Four Freedoms Park'), C('Smallpox Hospital','photo',40.7501,-73.9520,'',"Ruine gothique en pierre, pointe sud de Roosevelt Island."),
+    C('Cornell Tech','culture',40.7554,-73.9592,'',"Campus universitaire au sud de Roosevelt Island."),
+    C('Pepsi-Cola Sign','photo',40.7457,-73.9576,'',"L'enseigne historique, visible depuis Gantry Plaza State Park."),
+    E(P('Top of the Rock')),
+    P('Kitchen Arts & Letters'), P("Bloomingdale's"), P('Ralph Lauren — 867 Madison')
   ]},
-  {date:DAYS[6][0], title:'Queens & Roosevelt', note:"Bloc « Queens » du brief — à confirmer.", stops:[
-    E(P('Gantry Plaza State Park','11:00', "Les portiques ferroviaires, l'enseigne Pepsi, la meilleure vue sur Midtown.")),
-    P('Hunters Point South Park',''), P('MoMA PS1','12:00'),
-    P('Roosevelt Island Tramway','13:30', "Cette fois dans le sens Roosevelt → Manhattan."),
-    P("Macy's Herald Square",'17:00'), P('Empire State Building','')
+  {date:DAYS[6][0], title:'Harlem', note:"Boucle à pied (ou 25 min de métro depuis Midtown), retour par Central Park et la 5e Avenue.", stops:[
+    P('Marcus Garvey Park'), P('Astor Row'),
+    P("Sylvia's Restaurant"),
+    C('Fresques 125th St / Frederick Douglass Blvd','photo',40.8037,-73.9500,'',"Fresques murales le long de la 125th et de Frederick Douglass Blvd."),
+    P('Harlem / Apollo Theater'), P("Striver's Row"),
+    C('Hamilton Heights','photo',40.8241,-73.9492,'',"Quartier résidentiel historique autour de la 145e."),
+    P('General Grant Memorial'), P('Columbia University'),
+    P('Cathedral St John the Divine'),
+    C('Morningside Park — 121st St','park',40.8050,-73.9590,'',"Entrée côté Malcolm X Blvd / Frederick Douglass Blvd."),
+    P('Central Park Reservoir','', "En redescendant par Central Park."),
+    P('The Met','', "3h — voir le déroulé conseillé dans la note du musée.")
   ]},
-  {date:DAYS[7][0], title:'Midtown final & départ', note:"Vol retour. Garder la matinée souple selon l'heure du vol.", stops:[
-    P('New York Public Library','09:30'), P('Bryant Park','10:00'),
-    P('Grand Central Terminal','10:45', "Retour au hall étoilé, plus calme en matinée."),
-    P('Madison Square Park','12:00'), P('Flatiron Building',''),
-    E(P('Empire State Building','13:00', "Observatoire de jour, vue à 360°."))
+  {date:DAYS[7][0], title:'Départ', note:"Vol retour. Garder la matinée souple selon l'heure du vol.", stops:[
+    E(P('Summit One Vanderbilt','09:00', "Créneau matinal avant de filer à l'aéroport."))
   ]}
 ];}
 
@@ -769,15 +877,12 @@ function drawDetail(){
   tl.innerHTML = hotelRow(`Départ — ${HOTEL.name}`, firstStop, 'go') + d.stops.map((s,j) => {
     const active = j === S.sel;
     const c = pcol(j);
-    const edName = editTarget && editTarget.i === j && editTarget.field === 'name';
     const edNote = editTarget && editTarget.i === j && editTarget.field === 'note';
     return `<div class="st ${s.done?'done':''}" data-i="${j}">
       <span class="gut"><span class="num" style="background:${c}">${j+1}</span><span class="bar"></span></span>
       <span class="bd">
         <span class="r1">
-          ${edName
-            ? `<input class="nm-in" data-f="name" data-i="${j}" value="${esc(s.name)}">`
-            : `<span class="nm-tx" data-i="${j}">${esc(s.name)}<button data-a="editname" data-i="${j}" class="pencil">✎</button></span>`}
+          <span class="nm-tx" data-i="${j}">${esc(s.name)}</span>
           <input class="tm" data-f="time" data-i="${j}" value="${esc(s.time||'')}" placeholder="--:--" maxlength="5">
         </span>
         <span class="ct">${esc(CATS[s.cat].label)}${s.area?' · '+esc(s.area):''}${s.essential?' <span class="must">★ Incontournable</span>':''}</span>
@@ -838,20 +943,35 @@ function pinIcon(color, sz, glyph, active, ring){
   return L.divIcon({className:'', iconSize:[sz,sz], iconAnchor:[sz/2, sz],
     html:`<span class="pin"><i style="width:${sz}px;height:${sz}px;background:${color};${ring||''}"><s>${glyph}</s></i></span>`});
 }
+const NEARBY_KM = 0.9; // rayon "à proximité" pour suggérer magasins/spots photo non ajoutés au jour
 function drawMap(fit){
   if(!map) return;
   layer.clearLayers();
-  const d = cur(), pts = [[HOTEL.lat, HOTEL.lng]];
-  const primary = [[HOTEL.lat, HOTEL.lng]];   // itinéraire principal : tout sauf magasins/spots photo
-  const secondary = [];                        // magasins & spots photo "aux alentours"
+  const d = cur();
+  const usedNames = new Set(d.stops.map(s => s.name));
+
+  // Tous les lieux explicitement dans l'itinéraire du jour (quelle que soit leur catégorie)
+  // suivent le trait rouge, dans l'ordre. Seules les suggestions de la bibliothèque
+  // (magasins/spots photo pas encore ajoutés, mais proches) sont en secondaire.
+  const fullPts = [{lat:HOTEL.lat, lng:HOTEL.lng}];
+  d.stops.forEach(s => { if(s.lat != null) fullPts.push({lat:s.lat, lng:s.lng}); });
+
+  const nearest = (lat, lng) => {
+    let best = null, bd = Infinity;
+    fullPts.forEach(p => {
+      const dist = haversine(lat, lng, p.lat, p.lng);
+      if(dist < bd){ bd = dist; best = p; }
+    });
+    return {point:best, dist:bd};
+  };
+
+  const pts = fullPts.map(p => [p.lat, p.lng]);
   const hm = L.marker([HOTEL.lat, HOTEL.lng], {zIndexOffset:3000,
     icon: pinIcon('#14110C', 34, '🏨')}).addTo(layer);
   hm.bindPopup(popHtml({name:HOTEL.name, cat:'hotel', time:''}, null), {closeButton:false, offset:[0,-30]});
+
   d.stops.forEach((s,j) => {
     if(s.lat == null) return;
-    pts.push([s.lat, s.lng]);
-    const isSide = s.cat === 'shop' || s.cat === 'photo';
-    if(isSide) secondary.push({lat:s.lat, lng:s.lng}); else primary.push([s.lat, s.lng]);
     const active = j === S.sel, sz = active ? 38 : 30;
     const c = s.cat === 'shop' ? CATS.shop.color : pcol(j);
     const glyph = s.cat === 'shop' ? CATS.shop.icon : (j+1);
@@ -867,18 +987,52 @@ function drawMap(fit){
     m.bindPopup(popHtml(s, imgCache[s.name] || null), {closeButton:false, offset:[0,-30]});
     m.on('popupopen', e => spotImg(s, u => { if(u && m.isPopupOpen()) e.popup.setContent(popHtml(s, u)); }));
   });
-  // itinéraire principal : trait continu clair
-  if(primary.length > 1)
-    L.polyline(primary, {color:'#FCF9F1', weight:2.5, opacity:.85, dashArray:'2 7', lineCap:'round'}).addTo(layer);
-  // magasins/spots photo : reliés au point le plus proche de l'itinéraire principal, trait violet
-  const mainPts = primary.length > 1 ? primary : pts;
-  secondary.forEach(s => {
-    let best = mainPts[0], bd = Infinity;
-    mainPts.forEach(p => { const dist = haversine(s.lat, s.lng, p[0], p[1]); if(dist < bd){ bd = dist; best = p; } });
-    L.polyline([[s.lat, s.lng], best], {color:'#8A5A9E', weight:1.5, opacity:.55, dashArray:'1 6', lineCap:'round'}).addTo(layer);
+
+  // suggestions : magasins/spots photo de la bibliothèque, proches d'un point du jour, pas déjà ajoutés
+  const sideLines = [];
+  LIB.forEach(l => {
+    const [name, cat, lat, lng, area, note] = l;
+    if(cat !== 'shop' && cat !== 'photo') return;
+    if(usedNames.has(name)) return;
+    const {point, dist} = nearest(lat, lng);
+    if(!point || dist > NEARBY_KM) return;
+    const sug = {name, cat, lat, lng, area, note, time:''};
+    const m = L.marker([lat, lng], {
+      zIndexOffset:50,
+      icon: pinIcon(CATS[cat].color, 22, CATS[cat].icon)
+    }).addTo(layer);
+    m.setOpacity(0.72);
+    m.bindPopup(popHtml(sug, imgCache[name] || null), {closeButton:false, offset:[0,-22]});
+    m.on('popupopen', e => spotImg(sug, u => { if(u && m.isPopupOpen()) e.popup.setContent(popHtml(sug, u)); }));
+    sideLines.push([[lat, lng], [point.lat, point.lng]]);
+  });
+
+  // itinéraire principal : trait rouge continu, dans l'ordre exact du jour
+  if(pts.length > 1)
+    L.polyline(pts, {color:'#D9401F', weight:3, opacity:.9, lineCap:'round', lineJoin:'round'}).addTo(layer);
+  // magasins/spots photo suggérés : trait secondaire discret vers le point le plus proche du jour
+  sideLines.forEach(([a,b]) => {
+    L.polyline([a,b], {color:'#9C9186', weight:1.3, opacity:.4, dashArray:'1 6', lineCap:'round'}).addTo(layer);
   });
   if(fit && pts.length) map.fitBounds(pts, {padding:[54,54], maxZoom:15});
+  if(showMetro) drawSubway(layer);
 }
+
+let showMetro = false, showMetroAll = false;
+function drawSubway(targetLayer){
+  SUBWAY_LINES.forEach(line => {
+    const coords = line.st.map(name => SUBWAY_ST[name]).filter(Boolean);
+    if(coords.length > 1) L.polyline(coords, {color:line.color, weight:3, opacity:.55, lineCap:'round', lineJoin:'round'}).addTo(targetLayer);
+    coords.forEach((c,i) => {
+      const stName = line.st[i];
+      const m = L.marker(c, {zIndexOffset:10, icon: L.divIcon({className:'', iconSize:[9,9], iconAnchor:[4,4],
+        html:`<span style="display:block;width:9px;height:9px;border-radius:50%;background:#fff;border:2.5px solid ${line.color};box-shadow:0 1px 3px rgba(0,0,0,.4)"></span>`})
+      }).addTo(targetLayer);
+      m.bindPopup(`<span class="pop"><div><b>${esc(stName.split('-')[0])}</b><s>Ligne ${line.name}</s></div></span>`, {closeButton:false, offset:[0,-10]});
+    });
+  });
+}
+
 let allFilter = 'all';
 function drawMapAll(fit){
   if(!mapAll) return;
@@ -899,6 +1053,7 @@ function drawMapAll(fit){
     m.on('popupopen', e => spotImg(s, u => { if(u && m.isPopupOpen()) e.popup.setContent(popHtml(s, u)); }));
   });
   if(fit && pts.length) mapAll.fitBounds(pts, {padding:[40,40], maxZoom:15});
+  if(showMetroAll) drawSubway(layerAll);
 }
 
 /* ═══════ 9. Navigation ═══════ */
@@ -1042,6 +1197,16 @@ $('#cards').onclick = e => {
 };
 $('#btnBack').onclick = () => go('list');
 $('#btnBackAll').onclick = () => go('list');
+$('#btnMetro').onclick = () => {
+  showMetro = !showMetro;
+  $('#btnMetro').classList.toggle('on', showMetro);
+  drawMap(false);
+};
+$('#btnMetroAll').onclick = () => {
+  showMetroAll = !showMetroAll;
+  $('#btnMetroAll').classList.toggle('on', showMetroAll);
+  drawMapAll(false);
+};
 $('#btnBig').onclick = () => {
   S.big = !S.big;
   $('#mapbox').classList.toggle('big', S.big);
@@ -1080,7 +1245,6 @@ $('#tl').addEventListener('click', e => {
     if(a.dataset.a === 'done') st[i].done = !st[i].done;
     if(a.dataset.a === 'up' && i > 0){ st.splice(i-1, 0, st.splice(i,1)[0]); S.sel = i-1; }
     if(a.dataset.a === 'down' && i < st.length-1){ st.splice(i+1, 0, st.splice(i,1)[0]); S.sel = i+1; }
-    if(a.dataset.a === 'editname'){ editTarget = {i, field:'name'}; drawDetail(); return; }
     if(a.dataset.a === 'editnote'){ editTarget = {i, field:'note'}; drawDetail(); return; }
     refresh(); return;
   }

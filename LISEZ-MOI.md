@@ -57,30 +57,25 @@ la nouvelle version arrive à la prochaine ouverture avec du réseau. Si ça coi
 
 ---
 
-## Mise à jour v5 — hôtel, transports, budget, météo, mode Jour J, édition simplifiée
+## Mise à jour v6 — nouveau programme, métro, noms figés
 
 Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html` et `sw.js`
 (icônes et manifeste inchangés) → *Commit changes*.
 
 Ce qui change :
-- **The Renwick Hotel** est maintenant un point fixe sur toutes les cartes (icône 🏨).
-  Chaque jour part de l'hôtel et y revient, avec un mode de trajet suggéré
-  (à pied / métro / Uber-taxi) et une durée estimée — à vol d'oiseau, pas un vrai
-  calcul d'itinéraire MTA, c'est indiqué dans le texte.
-- **Double tracé sur la carte du jour** : un trait clair relie l'hôtel et l'itinéraire
-  principal (musées, incontournables, food, parcs) ; un trait violet pointillé relie
-  chaque magasin et spot photo au point le plus proche de cet itinéraire. Légende en
-  bas à gauche de la carte.
-- **Météo réelle** par jour (Open-Meteo, gratuit) à côté du lever/coucher de soleil —
-  n'apparaît qu'à l'approche du voyage (fenêtre de prévision ~16 jours).
-- **Budget** : champ optionnel par lieu, total automatique affiché en haut de chaque jour.
-- **Mode Jour J** : bouton qui estompe les lieux déjà cochés pour se concentrer sur
-  ce qu'il reste à faire.
-- **Édition par crayon** : les noms et notes des lieux ne sont plus des champs toujours
-  actifs — un tap sur le ✎ ouvre l'édition, un tap ailleurs la referme. Plus de clavier
-  qui surgit par erreur en sélectionnant un lieu.
-- **Boutons agrandis** partout (zones tactiles ≥ 40-44px) pour un usage au pouce plus
-  confortable sur iPhone.
+- **Ton nouveau programme est intégré** : les 8 jours ont été reconstruits d'après ton
+  document (Manhattan Sud, Greenwich/High Line, Brooklyn, Central Park/Upper Side, Harlem…),
+  avec les nouvelles adresses (Century 21, C.O. Bigelow, Beacon's Closet Manhattan, The Shed,
+  Kitchen Arts & Letters, Bloomingdale's, Ralph Lauren, Cornell Tech, enseigne Pepsi…).
+- **Horaires nettoyés** : seules les vraies réservations restent affichées (ferry Statue de
+  la Liberté 9h30, One World/Oculus 16h, spectacle Broadway 19h, Summit dernier jour 9h).
+  Tout le reste est libre.
+- **Le nom des lieux n'est plus modifiable** — texte fixe. Seule la note reste éditable
+  via le crayon ✎.
+- **Réseau de métro** superposable sur la carte du jour et la carte générale : bouton
+  🚇 Métro. Stations réelles (données publiques MTA/NYC Open Data), tracé en ligne droite
+  entre stations consécutives — un schéma utile pour se repérer, pas un plan officiel
+  précis au mètre près. Tape une station pour voir son nom et sa ligne.
 
-⚠️ Après la mise à jour, ouvre l'app en wifi une première fois pour que le service
-worker recharge la nouvelle version en cache.
+⚠️ Après la mise à jour, ouvre l'app en wifi une première fois pour que le service worker
+recharge la nouvelle version en cache.
