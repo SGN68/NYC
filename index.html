@@ -344,6 +344,16 @@ const CATS = {
   hotel:{label:'Hôtel', icon:'🏨', color:'#14110C'}
 };
 const LIB = [
+['Plymouth Church','culture',40.6975,-73.9946,'Brooklyn',"75 Hicks St. Église historique de Brooklyn Heights, étape de l'Underground Railroad."],
+['Fulton Ferry Landing','photo',40.7038,-73.9903,'Brooklyn',"L'embarcadère historique, vue directe sur le pont de Brooklyn et Manhattan."],
+['Clock Tower Building — Dumbo','photo',40.7024,-73.9932,'Brooklyn',"L'ancienne tour Watchtower des Témoins de Jéhovah, horloge visible de loin. Bon point de vue photo."],
+['Eagle Warehouse','photo',40.7027,-73.9930,'Brooklyn',"28 Old Fulton St. Ancien entrepôt reconverti en logements, jolie façade en brique avec horloge ronde."],
+['Brooklyn Flea (Dumbo)','shop',40.7028,-73.9885,'Brooklyn',"80 Pearl St, sous l'arche du Manhattan Bridge. Samedi et dimanche 10h-17h, avril à décembre — vintage, artisanat, déco."],
+['Carroll Gardens','photo',40.6795,-73.9990,'Brooklyn',"Quartier résidentiel calme au sud de Cobble Hill, jardins de devanture caractéristiques."],
+['Red Hook','photo',40.6743,-74.0110,'Brooklyn',"Ancien quartier portuaire, vue sur la Statue de la Liberté depuis le bord de l'eau. Un peu excentré."],
+['Brooklyn Botanic Garden','park',40.6694,-73.9629,'Brooklyn',"Attenant à Prospect Park. Le jardin japonais et l'allée des cerisiers sont les points forts."],
+['Grand Army Plaza','photo',40.6728,-73.9703,'Brooklyn',"Arc de triomphe monumental à l'entrée nord de Prospect Park."],
+
 ['Lego Store (Rockefeller Center)','shop',40.7588,-73.9787,'Manhattan',"620 5th Ave. Sur le chemin entre Rockefeller Center et la 5e Avenue."],
 ['Century 21 NYC','shop',40.7103,-74.0111,'Manhattan',"22 Cortlandt St. Grand magasin dégriffé, juste en face de l'Oculus et du World Trade Center."],
 ['C.O. Bigelow Apothecaries','shop',40.7343,-73.9989,'Manhattan',"414 6th Ave, Greenwich Village. La plus vieille pharmacie-apothicaire des États-Unis (1838), enseigne néon d'origine."],
@@ -592,25 +602,30 @@ function E(stop){ stop.essential = true; return stop; }
 function dayCost(d){ return d.stops.reduce((a,s) => a + (Number(s.cost)||0), 0); }
 function tripCost(){ return S.days.reduce((a,d) => a + dayCost(d), 0); }
 function defaultDays(){ return [
-  {date:DAYS[0][0], title:'Premier soir — Midtown', note:"Boucle à pied depuis Grand Central. L'ONU selon l'heure d'arrivée du vol.", stops:[
-    P('Grand Central Terminal'), P('Chrysler Building'), P('Daily News Building'),
-    P('Siège des Nations Unies','', "À voir selon l'heure d'arrivée — l'esplanade des drapeaux se voit de la 1re Av."),
-    P('Bryant Park'), P('New York Public Library'), P('Times Square'),
-    P('MoMA'), P('Rockefeller Center'), P('Lego Store (Rockefeller Center)'),
-    E(P('Summit One Vanderbilt'))
+  {date:DAYS[0][0], title:'Premier soir — Midtown', note:"Itinéraire GDR (Google Round-trip / boucle piétonne) ~1h30, plus les Nations Unies selon l'heure d'arrivée du vol.", stops:[
+    P('Grand Central Terminal'), P('Bryant Park'), P('Times Square'), P('MoMA'),
+    P('Rockefeller Center'), P('New York Public Library'), E(P('Summit One Vanderbilt')),
+    P('Chrysler Building'), P('Daily News Building'),
+    P('Siège des Nations Unies','', "Selon l'heure d'arrivée — l'esplanade des drapeaux se voit de la 1re Av."),
+    P('Lego Store (Rockefeller Center)')
   ]},
+
   {date:DAYS[1][0], title:'Downtown', note:"Réserve le ferry pour la Statue à l'avance. Sécurité type aéroport à Battery Park.", stops:[
     P('Battery Park'), P('Staten Island Ferry'),
     E(P('Statue de la Liberté','09:30', "Créneau réservé.")),
     P('Ellis Island'),
     P('9/11 Memorial & Museum'),
     E(P('One World Observatory','16:00', "Créneau réservé, puis l'Oculus juste en dessous.")),
-    P('Oculus (World Trade Center)'), P('Century 21 NYC'),
-    P('Wall Street / Charging Bull','', "En remontant Wall Street puis Broadway."),
-    P('Brookfield Place','', "Le mur de Berlin est au niveau de l'esplanade."),
+    P('Oculus (World Trade Center)'),
+    P('Century 21 NYC'),
+    C('Wall Street — balade','icon',40.7069,-74.0113,'', "En remontant Wall St : n°1 (Trinity Church), 26 (Federal Hall), 48, 55, 74, 67."),
+    P('Wall Street / Charging Bull'),
+    C('Broadway — Financial District','photo',40.7096,-74.0107,'', "En descendant Broadway : n°75, 120, 209, 233 — façades historiques du Financial District."),
+    P('Brookfield Place','', "Le segment du mur de Berlin est sur l'esplanade."),
     P('Pier A')
   ]},
-  {date:DAYS[2][0], title:'Manhattan Sud', note:"Grande marche à travers les quartiers du sud de Manhattan — Chinatown → Little Italy → Tribeca → Hudson Square → SoHo → Nolita → NoHo → East Village → Lower East Side.", stops:[
+
+  {date:DAYS[2][0], title:'Manhattan Sud', note:"Grande marche à travers les quartiers du sud de Manhattan.", stops:[
     C('Chinatown — marché','food',40.7158,-73.9970,'', "Marchés et épiceries, meilleur en matinée."),
     P('Little Italy','', "Mulberry St."),
     C('Tribeca','photo',40.7163,-74.0086,'', "Rues pavées, anciens entrepôts."),
@@ -623,60 +638,90 @@ function defaultDays(){ return [
     C('Lower East Side — balade','photo',40.7180,-73.9877,'', "Orchard St, Ludlow St."),
     C('Spectacle — Broadway','icon',40.7590,-73.9845,'19:00', "Réservation de spectacle — heure à respecter.")
   ]},
-  {date:DAYS[3][0], title:'Lower Manhattan — Greenwich & High Line', note:"Le MoMA ouvre à 10h30 (billets à l'avance conseillés). Beacon's Closet à Manhattan est la seule adresse de la chaîne hors Brooklyn.", stops:[
+
+  {date:DAYS[3][0], title:'Lower Manhattan', note:"Le MoMA ouvre à 10h30. Logistique retour indiquée dans les notes des derniers arrêts.", stops:[
     P('MoMA','', "Ouvre à 10h30 — compter 2h."),
-    P('Washington Square Park'),
-    C('Greenwich Village — balade','photo',40.7336,-74.0000,'', "~1h30 en flânant vers l'ouest."),
+    P('Washington Square Park','', "20 min de métro depuis le MoMA."),
+    C('Greenwich Village — balade','photo',40.7336,-74.0000,'', "Itinéraire GDR ~1h30 en flânant vers l'ouest."),
     P("Beacon's Closet (Greenwich Village)"),
     P('C.O. Bigelow Apothecaries'),
     P('West Village'),
     E(P('The High Line','', "Entre Meatpacking District et Hudson Yards, ~1h.")),
-    P('Vessel'), C('The Shed','culture',40.7533,-74.0029,'', "Programmation à vérifier avant de s'y arrêter."),
-    P('Edge — Hudson Yards'), P('Whitney Museum'),
-    P('Chelsea Market','', "Los Tacos No.1 au fond. L'Oreo est né ici."),
-    P('Union Square'), P('Madison Square Park'),
-    C('Koreatown','food',40.7480,-73.9866,'', "32nd St."),
-    P('230 Fifth Rooftop'),
+    P('Vessel'),
+    C('The Shed','culture',40.7533,-74.0029,'', "Programmation à vérifier avant de s'y arrêter."),
+    P('Edge — Hudson Yards'),
+    P('Whitney Museum'),
+    P('Chelsea Market','', "Los Tacos No.1 au fond. L'Oreo est né ici. Itinéraire GDR ensuite."),
+    P('Union Square'),
+    P('Madison Square Park'),
+    C('Koreatown','food',40.7480,-73.9866,'', "32nd St — pour boire un verre ou dîner."),
+    P('230 Fifth Rooftop','', "Un verre avec l'Empire State en face."),
     P('Flatiron Building'),
     E(P('Empire State Building'))
   ]},
-  {date:DAYS[4][0], title:'Brooklyn & Williamsburg', note:"Smorgasburg le samedi 11h-18h si tu veux caler le déjeuner là-bas.", stops:[
-    P('City Hall / Civic Center','', "City Hall + Supreme Court avant la passerelle."),
-    E(P('Brooklyn Bridge (traversée)','', "~35 min, vers Brooklyn.")),
+
+  {date:DAYS[4][0], title:'Brooklyn', note:"Smorgasburg et Brooklyn Flea le samedi seulement (10h-17h/18h). NYC Ferry pratique pour les déplacements de fin de journée.", stops:[
+    C('Brooklyn Bridge-City Hall','icon',40.7133,-74.0044,'','20 min de métro depuis l\'hôtel. City Hall + New York County Supreme Court avant la passerelle.'),
+    E(P('Brooklyn Bridge (traversée)','08:30', "Traversée ~35 min vers Brooklyn.")),
+    C('Brooklyn Heights — Montague/Remsen/Pierrepont','photo',40.6955,-73.9936,'', "Boucle ~1h30 : Montague St → Remsen St → Pierrepont St → Promenade → Willow St → 24 Middagh St → Plymouth Church."),
     P('Brooklyn Heights Promenade'),
-    C('Vinegar Hill Historic District','photo',40.7025,-73.9808,'',"Petites rues pavées entre Dumbo et le Brooklyn Navy Yard."),
-    P('Brooklyn Bridge Park — Pier 1'), P('Squibb Park Bridge'), P('Tobacco Warehouse'),
-    P("Jane's Carousel"), P('Pebble Beach (Main St)'), P('Dumbo — Washington St'),
-    P('Time Out Market','', "Ou Juliana's juste en dessous."),
-    P('Domino Park'),
-    P('Smorgasburg (Williamsburg)','', "Samedi seulement, 11h-18h."),
-    P('Bedford Avenue'), P('10ft Single by Stella Dallas'),
-    C('McCarren Park','park',40.7202,-73.9515,'',"Entre Williamsburg et Greenpoint."),
-    C('Greenpoint — balade','photo',40.7304,-73.9548,'',"Manhattan Ave et les rues autour."),
-    P('The Bushwick Collective')
+    P('Plymouth Church'),
+    P('Squibb Park Bridge'),
+    P('Fulton Ferry Landing'),
+    P('Brooklyn Bridge Park — Pier 1'),
+    P('Tobacco Warehouse'),
+    P("Jane's Carousel"),
+    P('Pebble Beach (Main St)'),
+    P('Clock Tower Building — Dumbo'),
+    P('Eagle Warehouse'),
+    P('Brooklyn Flea (Dumbo)'),
+    P('Time Out Market','', "Déjeuner."),
+    C('Ferry vers Williamsburg','icon',40.7042,-73.9936,'14:00',"~45 min sur l'eau, ligne NYC Ferry East River."),
+    P('Bedford Avenue'),
+    C('The Lost Time','shop',null,null,'', "Friperie/bar mentionné dans le brief — adresse à confirmer, je n'ai pas trouvé de source fiable. Dis-moi si tu as le nom exact ou le quartier précis."),
+    P('The Bushwick Collective','', "~15 min de métro depuis Williamsburg. Compter 1h30."),
+    C('Retour à Williamsburg','custom',40.7171,-73.9569,'19:00',""),
+    E(P('Domino Park','19:30', "Coucher de soleil, puis dîner.")),
+    C('Retour : pont de nuit ou métro','custom',null,null,'',"Traversée du Brooklyn Bridge de nuit si l'énergie suit, sinon métro direct depuis Williamsburg."),
+    C('Carroll Gardens','photo',40.6795,-73.9990,'', "Option si le temps le permet — quartier calme, à combiner avec Red Hook."),
+    C('Red Hook','photo',40.6743,-74.0110,'', "Option — vue sur la Statue de la Liberté, un peu excentré."),
+    C('Prospect Park (option)','park',40.6602,-73.9690,'', "Option, avec le Brooklyn Botanic Garden si le temps le permet."),
+    P('Brooklyn Botanic Garden','', "Option, attenant à Prospect Park."),
+    P('Grand Army Plaza','', "Option, entrée nord de Prospect Park.")
   ]},
+
   {date:DAYS[5][0], title:'Central Park & Upper West/East Side', note:"AMNH ouvre à 10h — compter 4h. Téléphérique Roosevelt Island inclus dans la MetroCard.", stops:[
+    C('Central Park — matin','park',40.7794,-73.9691,'', "35 min à pied ou métro depuis l'hôtel, ~30 min de balade."),
+    P('Columbus Circle','', "Puis itinéraire GDR jusqu'au musée."),
     P('American Museum of Natural History','', "Ouvre à 10h — compter 4h."),
-    P('Central Park'), P('Columbus Circle'),
-    P('Roosevelt Island Tramway','', "Inclus dans la MetroCard."),
-    P('Four Freedoms Park'), C('Smallpox Hospital','photo',40.7501,-73.9520,'',"Ruine gothique en pierre, pointe sud de Roosevelt Island."),
-    C('Cornell Tech','culture',40.7554,-73.9592,'',"Campus universitaire au sud de Roosevelt Island."),
-    C('Pepsi-Cola Sign','photo',40.7457,-73.9576,'',"L'enseigne historique, visible depuis Gantry Plaza State Park."),
-    E(P('Top of the Rock')),
-    P('Kitchen Arts & Letters'), P("Bloomingdale's"), P('Ralph Lauren — 867 Madison')
+    P('Central Park'),
+    P('5e Avenue'),
+    P('Kitchen Arts & Letters'),
+    P('Ralph Lauren — 867 Madison'),
+    P("Bloomingdale's"),
+    P('Roosevelt Island Tramway','', "Inclus dans la MetroCard, ~48 min pour la boucle."),
+    P('Four Freedoms Park'),
+    C('Smallpox Hospital','photo',40.7501,-73.9520,'', "Ruine gothique en pierre, pointe sud de Roosevelt Island."),
+    C('Cornell Tech','culture',40.7554,-73.9592,'', "Campus universitaire au sud de Roosevelt Island."),
+    C('Pepsi-Cola Sign','photo',40.7457,-73.9576,'', "Enseigne historique, visible depuis Gantry Plaza State Park — compter 1h pour la boucle Roosevelt Island."),
+    E(P('Top of the Rock'))
   ]},
-  {date:DAYS[6][0], title:'Harlem', note:"Boucle à pied (ou 25 min de métro depuis Midtown), retour par Central Park et la 5e Avenue.", stops:[
+
+  {date:DAYS[6][0], title:'Harlem', note:"Boucle à pied (~1h30) ou 25 min de métro depuis Midtown, retour par Central Park et la 5e Avenue nord.", stops:[
     P('Marcus Garvey Park'), P('Astor Row'),
     P("Sylvia's Restaurant"),
-    C('Fresques 125th St / Frederick Douglass Blvd','photo',40.8037,-73.9500,'',"Fresques murales le long de la 125th et de Frederick Douglass Blvd."),
+    C('Fresques 125th St / Frederick Douglass Blvd','photo',40.8037,-73.9500,'', "Fresques murales le long de la 125th et de Frederick Douglass Blvd."),
     P('Harlem / Apollo Theater'), P("Striver's Row"),
-    C('Hamilton Heights','photo',40.8241,-73.9492,'',"Quartier résidentiel historique autour de la 145e."),
+    C('Hamilton Heights','photo',40.8241,-73.9492,'', "Quartier résidentiel historique autour de la 145e."),
     P('General Grant Memorial'), P('Columbia University'),
     P('Cathedral St John the Divine'),
-    C('Morningside Park — 121st St','park',40.8050,-73.9590,'',"Entrée côté Malcolm X Blvd / Frederick Douglass Blvd."),
-    P('Central Park Reservoir','', "En redescendant par Central Park."),
-    P('The Met','', "3h — voir le déroulé conseillé dans la note du musée.")
+    C('Morningside Park — 121st St','park',40.8050,-73.9590,'', "Entrée côté Malcolm X Blvd / Frederick Douglass Blvd — retour vers Central Park."),
+    C('Central Park Reservoir','park',40.7855,-73.9613,'', "Itinéraire GDR jusqu'au réservoir en redescendant."),
+    C('Terrasse du MET','food',40.7794,-73.9632,'', "Un verre en terrasse avant ou après la visite."),
+    P('The Met','', "3h — voir le déroulé conseillé dans la note du musée."),
+    C('5e Avenue nord','photo',40.7828,-73.9590,'', "Pour finir la journée en descendant vers l'hôtel.")
   ]},
+
   {date:DAYS[7][0], title:'Départ', note:"Vol retour. Garder la matinée souple selon l'heure du vol.", stops:[
     E(P('Summit One Vanderbilt','09:00', "Créneau matinal avant de filer à l'aéroport."))
   ]}

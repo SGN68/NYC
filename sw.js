@@ -2,8 +2,8 @@
    Objectif : l'app démarre sans réseau, et les tuiles de carte déjà vues
    restent disponibles hors ligne (utile en roaming aux États-Unis). */
 
-const SHELL = 'nyc-shell-v6';   // fichiers de l'app
-const RUN   = 'nyc-run-v6';     // Leaflet + tuiles, mis en cache à l'usage
+const SHELL = 'nyc-shell-v7';   // fichiers de l'app
+const RUN   = 'nyc-run-v7';     // Leaflet + tuiles, mis en cache à l'usage
 
 const FILES = [
   './',

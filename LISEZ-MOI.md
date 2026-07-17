@@ -57,25 +57,27 @@ la nouvelle version arrive à la prochaine ouverture avec du réseau. Si ça coi
 
 ---
 
-## Mise à jour v6 — nouveau programme, métro, noms figés
+## Mise à jour v7 — reconstruction complète du programme
 
 Dans ton dépôt GitHub : **Add file → Upload files**, glisse `index.html` et `sw.js`
 (icônes et manifeste inchangés) → *Commit changes*.
 
-Ce qui change :
-- **Ton nouveau programme est intégré** : les 8 jours ont été reconstruits d'après ton
-  document (Manhattan Sud, Greenwich/High Line, Brooklyn, Central Park/Upper Side, Harlem…),
-  avec les nouvelles adresses (Century 21, C.O. Bigelow, Beacon's Closet Manhattan, The Shed,
-  Kitchen Arts & Letters, Bloomingdale's, Ralph Lauren, Cornell Tech, enseigne Pepsi…).
-- **Horaires nettoyés** : seules les vraies réservations restent affichées (ferry Statue de
-  la Liberté 9h30, One World/Oculus 16h, spectacle Broadway 19h, Summit dernier jour 9h).
-  Tout le reste est libre.
-- **Le nom des lieux n'est plus modifiable** — texte fixe. Seule la note reste éditable
-  via le crayon ✎.
-- **Réseau de métro** superposable sur la carte du jour et la carte générale : bouton
-  🚇 Métro. Stations réelles (données publiques MTA/NYC Open Data), tracé en ligne droite
-  entre stations consécutives — un schéma utile pour se repérer, pas un plan officiel
-  précis au mètre près. Tape une station pour voir son nom et sa ligne.
+J'ai entièrement refait l'extraction de ton document (la fois précédente, la mise en
+page du tableau Word avait brouillé certains passages) et reconstruit les 8 jours en
+suivant ton texte de très près, avec beaucoup plus de détail qu'avant :
+- Le parcours précis de Brooklyn Heights (Montague → Remsen → Pierrepont → Promenade →
+  Willow St → 24 Middagh → Plymouth Church), Fulton Ferry Landing, le Clock Tower Building,
+  Eagle Warehouse, le Brooklyn Flea du samedi.
+- Les adresses numérotées de Wall Street et Broadway, regroupées en deux arrêts avec le
+  détail dans la note plutôt que dix arrêts séparés.
+- Les options de fin de journée à Brooklyn (Carroll Gardens, Red Hook, Prospect Park,
+  Brooklyn Botanic Garden, Grand Army Plaza) — ajoutées mais clairement en option.
+- La boucle complète de Roosevelt Island, Kitchen Arts & Letters, Ralph Lauren,
+  Bloomingdale's dans le bon ordre.
+- Le MET en fin de journée à Harlem (terrasse + visite de 3h), la 5e Avenue nord pour finir.
 
-⚠️ Après la mise à jour, ouvre l'app en wifi une première fois pour que le service worker
-recharge la nouvelle version en cache.
+⚠️ Un point reste flou : **« The Lost Time »** à Williamsburg — je n'ai trouvé aucune
+source fiable pour cette adresse. Le lieu apparaît dans ton itinéraire (jour Brooklyn)
+mais sans repère sur la carte. Dis-moi le nom exact ou le quartier précis si tu l'as.
+
+Après la mise à jour, ouvre l'app en wifi une première fois.
